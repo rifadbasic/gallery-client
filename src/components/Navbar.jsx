@@ -86,24 +86,24 @@ const Navbar = () => {
       } top-12 w-36 rounded-xl bg-white dark:bg-[#0d1d33] shadow-lg border dark:border-gray-700 z-50`}
     >
       <Link
-        className="block px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-800"
+        className="block px-4 py-2 hover:rounded-xl hover:bg-gray-800"
         to="/dashboard/profile"
       >
         My Profile
       </Link>
       <Link
-        className="block px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-800"
+        className="block px-4 py-2 hover:rounded-xl hover:bg-gray-800"
         to="/login"
       >
         Login
       </Link>
       <Link
-        className="block px-4 py-2 hover:bg-indigo-50 dark:hover:bg-gray-800"
+        className="block px-4 py-2 hover:rounded-xl hover:bg-gray-800"
         to="/register"
       >
         Register
       </Link>
-      <button className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-gray-800">
+      <button className="w-full text-left px-4 py-2 text-red-500 hover:rounded-xl hover:bg-gray-800">
         Logout
       </button>
     </div>

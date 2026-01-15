@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router";
-import {
-  User,
-  Settings,
-  Shield,
-  Lock,
-  LayoutDashboard,
-  Home,
-  X,
-} from "lucide-react";
+import { User, Settings, LayoutDashboard, Home, X, Image } from "lucide-react";
 
 const UserLayout = () => {
   const [open, setOpen] = useState(false);
@@ -24,13 +16,17 @@ const UserLayout = () => {
       path: "/dashboard/profile",
       icon: <User size={20} />,
     },
+
+    {
+      name: "My Gallery",
+      path: "/dashboard/user-gallery/my-gallery",
+      icon: <Image size={20} />,
+    },
     {
       name: "Account Settings",
       path: "/dashboard/settings",
       icon: <Settings size={20} />,
     },
-    { name: "Privacy", path: "/dashboard/privacy", icon: <Shield size={20} /> },
-    { name: "Security", path: "/dashboard/security", icon: <Lock size={20} /> },
   ];
 
   return (

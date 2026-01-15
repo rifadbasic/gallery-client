@@ -6,6 +6,12 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import UserLayoute from "../layoutes/UserLayoute";
 import UserProfile from "../pages/UserDashboard/UserProfile";
+import UserGalleryLayout from "../layoutes/UserGalleryLayout";
+import MyGallery from "../pages/UserGallery/MyGallery";
+import MyImage from "../pages/UserGallery/MyImage";
+import AddImage from "../pages/UserGallery/AddImage";
+import Account from "../pages/UserDashboard/Account";
+import Dashboard from "../pages/UserDashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -34,9 +40,22 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/dashboard",
-        element: <Home />,
+        element: <Dashboard />,
       },
       { path: "profile", element: <UserProfile /> },
+      {
+        path: "user-gallery",
+        errorElement: <NotFound />,
+        element: <UserGalleryLayout />,
+        children: [
+          { path: "my-gallery", element: <MyGallery /> },
+          { path: "my-image", element: <MyImage /> },
+          { path: "add-image", element: <AddImage /> },
+        ]
+      },{
+        path: "settings",
+        element: <Account />,
+      },
     ],
   },
 ]);

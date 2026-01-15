@@ -1,0 +1,266 @@
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import useAxios from "../../hooks/useAxios";
+
+const initialState = {
+  img: "",
+  name: "",
+  description: "",
+  category: "Photography",
+  role: "regular",
+  status: "Unsold",
+  price: "",
+  discountPercent: 0,
+  finalPrice: "",
+  likes: 0,
+};
+
+const AddImage = () => {
+  const axiosInstance = useAxios();
+
+  const [uploading, setUploading] = useState(false);
+  const [formData, setFormData] = useState(initialState);
+
+  const handleImageUpload = async (e) => {
+    const image = e.target.files[0];
+    if (!image) return;
+
+    setUploading(true);
+    const fd = new FormData();
+    fd.append("image", image);
+
+    try {
+      const url = `https://api.imgbb.com/1/upload?key=${
+        import.meta.env.VITE_image_uplode_key
+      }`;
+
+      const res = await axios.post(url, fd);
+
+      setFormData((prev) => ({ ...prev, img: res.data.data.url }));
+
+      toast.success("Image uploaded successfully 🌿");
+    } catch {
+      toast.error("Image upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePriceChange = (e) => {
+    const price = Number(e.target.value);
+    const discount = Number(formData.discountPercent);
+
+    const finalPrice = price - (price * discount) / 100;
+
+    setFormData((prev) => ({
+      ...prev,
+      price,
+      finalPrice: finalPrice.toFixed(2),
+    }));
+  };
+
+  const handleDiscountChange = (e) => {
+    const discount = Number(e.target.value);
+    const price = Number(formData.price);
+
+    const finalPrice = price - (price * discount) / 100;
+
+    setFormData((prev) => ({
+      ...prev,
+      discountPercent: discount,
+      finalPrice: finalPrice.toFixed(2),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.img) {
+      toast.error("Please upload an image first!");
+      return;
+    }
+
+    try {
+      const payload = {
+        ...formData,
+        createdAt: new Date(),
+      };
+
+      const res = await axiosInstance.post("/images", payload);
+      if (res.data.insertedId) {
+        alert("Image added successfully!");
+      }
+      
+
+      // console.log(res.data);
+
+      // 🔥🔥🔥 IMPORTANT PART — RESET FORM AFTER SUCCESS 🔥🔥🔥
+      setFormData(initialState);
+    } catch (error) {
+      toast.error("Failed to add image");
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+        Add New Image to Gallery
+      </h1>
+
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow-lg"
+      >
+        {/* Image Upload */}
+        <div className="md:col-span-2">
+          <label className="block mb-2 text-gray-700 dark:text-gray-300">
+            Upload Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="w-full border p-2 rounded-lg"
+          />
+
+          {uploading && (
+            <p className="text-sm mt-2 text-indigo-500">Uploading...</p>
+          )}
+
+          {formData.img && (
+            <img
+              src={formData.img}
+              alt="preview"
+              className="mt-3 h-40 w-40 object-cover rounded-lg"
+            />
+          )}
+        </div>
+
+        {/* Name */}
+        <div>
+          <label className="block mb-2">Image Name</label>
+          <input
+            type="text"
+            placeholder="Sunset in Cox's Bazar"
+            className="w-full border p-2 rounded-lg"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+        </div>
+
+        {/* Category */}
+        <div>
+          <label className="block mb-2">Category</label>
+          <select
+            className="w-full border p-2 rounded-lg"
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >
+            <option>Photography</option>
+            <option>Digital Art</option>
+            <option>Illustration</option>
+            <option>Cinematography</option>
+            <option>Mixed media</option>
+          </select>
+        </div>
+
+        {/* Role */}
+        <div>
+          <label className="block mb-2">Image Role</label>
+          <select
+            className="w-full border p-2 rounded-lg"
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          >
+            <option value="regular">Regular</option>
+            <option value="premium">Premium</option>
+          </select>
+        </div>
+
+        {/* Status */}
+        <div>
+          <label className="block mb-2">Status</label>
+          <select
+            className="w-full border p-2 rounded-lg"
+            value={formData.status}
+            onChange={(e) =>
+              setFormData({ ...formData, status: e.target.value })
+            }
+          >
+            <option value="Unsold">Unsold</option>
+            <option value="Sold">Sold</option>
+            <option value="Global">Global</option>
+          </select>
+        </div>
+
+        {/* Price */}
+        <div>
+          <label className="block mb-2">Price (৳)</label>
+          <input
+            type="number"
+            className="w-full border p-2 rounded-lg"
+            value={formData.price}
+            onChange={handlePriceChange}
+            required
+          />
+        </div>
+
+        {/* Discount */}
+        <div>
+          <label className="block mb-2">Discount (%)</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            className="w-full border p-2 rounded-lg"
+            value={formData.discountPercent}
+            onChange={handleDiscountChange}
+          />
+        </div>
+
+        {/* Final Price */}
+        <div className="md:col-span-2">
+          <label className="block mb-2">Final Price (৳)</label>
+          <input
+            type="text"
+            className="w-full border p-2 rounded-lg bg-gray-100"
+            value={formData.finalPrice}
+            readOnly
+          />
+        </div>
+
+        {/* Description */}
+        <div className="md:col-span-2">
+          <label className="block mb-2">Description</label>
+          <textarea
+            rows="4"
+            className="w-full border p-2 rounded-lg"
+            placeholder="Write a beautiful description..."
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            required
+          />
+        </div>
+
+        {/* Submit */}
+        <div className="md:col-span-2">
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+          >
+            Add Image to Gallery
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default AddImage;
