@@ -1,0 +1,17 @@
+title.text{
+    color: #333;
+}
+
+.dark .title-text{
+    color: #fff;
+}
+
+
+.div-bg{
+    background-color: #c7c7c7f6;
+    color: #333;
+}
+.dark .div-bg{
+    background-color: #8b8b8bf5;
+    color: #f8f8f8;
+}

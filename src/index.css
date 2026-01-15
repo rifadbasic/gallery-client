@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional root vars for global background */
+:root {
+  --bg-light: #ffffff;
+  --bg-dark: #0d1d33;
+
+  --text-light: #12305ae8;
+}
+
+/* Optional body fallback */
+body {
+  background-color: var(--bg-light);
+  color: #000;
+}
+
+.dark body {
+  background-color: var(--bg-dark);
+  color: white;
+}
