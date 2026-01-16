@@ -77,11 +77,10 @@ const Dashboard = () => {
                 className="h-28 rounded-lg bg-gray-200 dark:bg-gray-800 overflow-hidden"
               >
                 <img
-                  src={`https://source.unsplash.com/random/400x300?gallery=${item}`}
+                  src={`https://picsum.photos/400/300?random=${item}`}
                   alt="Uploaded"
                   className="w-full h-full object-cover"
-                />
-              </div>
+                />              </div>
             ))}
           </div>
         </div>
@@ -100,7 +99,7 @@ const Dashboard = () => {
                 className="h-28 rounded-lg bg-gray-200 dark:bg-gray-800 overflow-hidden"
               >
                 <img
-                  src={`https://source.unsplash.com/random/400x300?love=${item}`}
+                  src={`https://picsum.photos/400/300?love=${item}`}
                   alt="Favorite"
                   className="w-full h-full object-cover"
                 />

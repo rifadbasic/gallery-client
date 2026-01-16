@@ -60,11 +60,13 @@ const Header = () => {
         </p>
 
         {/* Gallery Tour Button */}
-        <Link to="/gallery">
-          <button className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-full transition shadow-lg">
-            <Camera className="w-5 h-5" />
-            Start Gallery Tour
-          </button>
+        <Link
+          to="/gallery"
+          className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-full transition shadow-lg"
+          role="button"
+        >
+          <Camera className="w-5 h-5" />
+          Start Gallery Tour
         </Link>
       </div>
 

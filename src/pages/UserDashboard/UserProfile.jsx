@@ -1,29 +1,72 @@
+import { useEffect, useState, useContext } from "react";
 import { Mail, Phone, MapPin, Calendar, Edit } from "lucide-react";
+import useAxios from "../../hooks/useAxios"; // adjust path if needed
+import {AuthContext} from "../../context/AuthContext"; // if you're using Firebase
 
 const UserProfile = () => {
-  // Later you can replace this with real data from your backend
-  const user = {
-    name: "Khan Rifad Hossain",
-    email: "rifad@example.com",
-    phone: "+880 17XXXXXXXX",
-    location: "Bagerhat, Khulna, Bangladesh",
-    role: "User",
-    memberSince: "January 2025",
+  const userAxios = useAxios();
+  // const { user: authUser } = useAuth();
+  const { user: authUser } = useContext(AuthContext); // logged-in user
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await userAxios.get(`/users/${authUser.email}`);
+        setUser(res.data);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (authUser?.email) {
+      fetchUser();
+    }
+  }, [authUser, userAxios]);
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p className="text-lg font-medium">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p className="text-lg text-red-500">Failed to load profile</p>
+      </div>
+    );
+  }
+
+  // Mapping API data to your UI fields (without changing design)
+  const profileData = {
+    name: user.name,
+    email: user.email,
+    phone: user.phone || "+880 17XXXXXXXX",
+    location: user.location || "Bagerhat, Khulna, Bangladesh",
+    role: user.role || "User",
+    memberSince: new Date(user.createdAt).toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    }),
     bio: "A passionate learner in Computer Science Technology, building dreams in code and believing in discipline, faith, and progress.",
-    avatar:
-      "https://images.unsplash.com/photo-1633332755192-727a05c4013d",
-    cover:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    avatar: user.photo,
+    cover: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
   };
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6">
       <div className="bg-white dark:bg-[#0d1d33] rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-
         {/* COVER PHOTO */}
         <div className="relative h-40 md:h-56">
           <img
-            src={user.cover}
+            src={profileData.cover}
             alt="cover"
             className="w-full h-full object-cover"
           />
@@ -33,14 +76,16 @@ const UserProfile = () => {
         <div className="relative px-6 pb-6">
           <div className="flex flex-col md:flex-row items-center md:items-end gap-4 -mt-16">
             <img
-              src={user.avatar}
+              src={profileData.avatar}
               alt="avatar"
               className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-[#0d1d33] object-cover shadow-md"
             />
 
             <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold">{user.name}</h2>
-              <p className="text-gray-500 dark:text-gray-400">{user.role}</p>
+              <h2 className="text-2xl font-bold">{profileData.name}</h2>
+              <p className="text-gray-500 dark:text-gray-400">
+                {profileData.role}
+              </p>
             </div>
 
             <button className="ml-auto mt-4 md:mt-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition">
@@ -54,12 +99,11 @@ const UserProfile = () => {
 
         {/* PROFILE DETAILS GRID */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-
           <div className="flex items-center gap-3">
             <Mail className="text-indigo-600" />
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
-              <p className="font-medium">{user.email}</p>
+              <p className="font-medium">{profileData.email}</p>
             </div>
           </div>
 
@@ -67,23 +111,27 @@ const UserProfile = () => {
             <Phone className="text-indigo-600" />
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-              <p className="font-medium">{user.phone}</p>
+              <p className="font-medium">{profileData.phone}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <MapPin className="text-indigo-600" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
-              <p className="font-medium">{user.location}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Location
+              </p>
+              <p className="font-medium">{profileData.location}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Calendar className="text-indigo-600" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Member Since</p>
-              <p className="font-medium">{user.memberSince}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Member Since
+              </p>
+              <p className="font-medium">{profileData.memberSince}</p>
             </div>
           </div>
         </div>
@@ -92,7 +140,7 @@ const UserProfile = () => {
         <div className="px-6 pb-6">
           <h3 className="text-lg font-semibold mb-2">About</h3>
           <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-            {user.bio}
+            {profileData.bio}
           </p>
         </div>
       </div>

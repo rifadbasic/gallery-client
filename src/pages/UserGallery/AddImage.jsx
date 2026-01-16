@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast, Bounce } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
+import { AuthContext } from "../../context/AuthContext"; // Firebase or your auth context
 
 const initialState = {
   img: "",
@@ -18,10 +19,13 @@ const initialState = {
 
 const AddImage = () => {
   const axiosInstance = useAxios();
+  const { user: authUser } = useContext(AuthContext); // logged-in user
 
   const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState(initialState);
 
+  // Upload image to imgbb
   const handleImageUpload = async (e) => {
     const image = e.target.files[0];
     if (!image) return;
@@ -36,9 +40,7 @@ const AddImage = () => {
       }`;
 
       const res = await axios.post(url, fd);
-
       setFormData((prev) => ({ ...prev, img: res.data.data.url }));
-
       toast.success("Image uploaded successfully 🌿");
     } catch {
       toast.error("Image upload failed. Please try again.");
@@ -47,15 +49,17 @@ const AddImage = () => {
     }
   };
 
+  // Price and discount logic
   const handlePriceChange = (e) => {
-    const price = Number(e.target.value);
-    const discount = Number(formData.discountPercent);
+    const validPrice = parseFloat(e.target.value);
+    if (isNaN(validPrice) || validPrice < 0) return;
 
-    const finalPrice = price - (price * discount) / 100;
+    const discount = Number(formData.discountPercent);
+    const finalPrice = validPrice - (validPrice * discount) / 100;
 
     setFormData((prev) => ({
       ...prev,
-      price,
+      price: validPrice,
       finalPrice: finalPrice.toFixed(2),
     }));
   };
@@ -63,7 +67,6 @@ const AddImage = () => {
   const handleDiscountChange = (e) => {
     const discount = Number(e.target.value);
     const price = Number(formData.price);
-
     const finalPrice = price - (price * discount) / 100;
 
     setFormData((prev) => ({
@@ -73,33 +76,54 @@ const AddImage = () => {
     }));
   };
 
+  // Submit new image
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
     if (!formData.img) {
       toast.error("Please upload an image first!");
       return;
     }
 
+    if (!authUser) {
+      toast.error("User not logged in!");
+      return;
+    }
+
+    setSubmitting(true);
+
     try {
       const payload = {
         ...formData,
         createdAt: new Date(),
+        userEmail: authUser.email, // attach user info
+        userName: authUser.name || authUser.displayName,
+        userPhoto: authUser.photo || authUser.photoURL,
       };
 
       const res = await axiosInstance.post("/images", payload);
-      if (res.data.insertedId) {
-        alert("Image added successfully!");
+
+      if (res.status === 201 || res.data?.data) {
+        toast.success("Image added successfully 🌿", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
+        setFormData(initialState); // reset form
       }
-      
-
-      // console.log(res.data);
-
-      // 🔥🔥🔥 IMPORTANT PART — RESET FORM AFTER SUCCESS 🔥🔥🔥
-      setFormData(initialState);
     } catch (error) {
-      toast.error("Failed to add image");
       console.error(error);
+      toast.error("Failed to add image");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -124,11 +148,9 @@ const AddImage = () => {
             onChange={handleImageUpload}
             className="w-full border p-2 rounded-lg"
           />
-
           {uploading && (
             <p className="text-sm mt-2 text-indigo-500">Uploading...</p>
           )}
-
           {formData.img && (
             <img
               src={formData.img}
@@ -203,6 +225,7 @@ const AddImage = () => {
           <label className="block mb-2">Price (৳)</label>
           <input
             type="number"
+            min="0"
             className="w-full border p-2 rounded-lg"
             value={formData.price}
             onChange={handlePriceChange}
@@ -253,9 +276,10 @@ const AddImage = () => {
         <div className="md:col-span-2">
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+            disabled={submitting}
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Image to Gallery
+            {submitting ? "Submitting..." : "Add Image to Gallery"}
           </button>
         </div>
       </form>

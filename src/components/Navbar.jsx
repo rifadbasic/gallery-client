@@ -1,15 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, NavLink } from "react-router";
-import {
-  Menu,
-  X,
-  Image,
-  ShoppingCart,
-  Heart,
-  Search,
-  User,
-} from "lucide-react";
+import { useState, useEffect, useRef, useContext } from "react";
+import { Link, NavLink, useNavigate } from "react-router";
+import { Menu, X, Search, User, Camera } from "lucide-react";
 import ThemeToggle from "../Utils/ThemeTroggle";
+import FavoriteNavButton from "../components/FavoriteNavButton";
+import ExplorePlanButton from "../components/ExplorePlanButton";
+import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,10 +13,12 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
-  // ✅ FIX: refs added
   const mobileMenuRef = useRef(null);
   const desktopProfileRef = useRef(null);
   const mobileProfileRef = useRef(null);
+
+  const { user, logOut } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   /* Sticky navbar */
   useEffect(() => {
@@ -29,10 +27,9 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* ✅ Click outside to close menu & profile */
+  /* Click outside to close menu & profile */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      // close mobile menu
       if (
         isOpen &&
         mobileMenuRef.current &&
@@ -40,8 +37,6 @@ const Navbar = () => {
       ) {
         setIsOpen(false);
       }
-
-      // close profile dropdown (desktop + mobile safe)
       if (
         profileOpen &&
         !desktopProfileRef.current?.contains(e.target) &&
@@ -57,8 +52,8 @@ const Navbar = () => {
 
   const navLinks = (
     <>
-      {["/", "/gallery", "/subscription", "/about"].map((path, i) => {
-        const labels = ["Home", "Gallery", "Subscription", "About"];
+      {["/", "/gallery", "/about"].map((path, i) => {
+        const labels = ["Home", "Gallery", "About"];
         return (
           <NavLink
             key={path}
@@ -85,27 +80,45 @@ const Navbar = () => {
         align === "right" ? "-right-10" : "-left-14"
       } top-12 w-36 rounded-xl bg-white dark:bg-[#0d1d33] shadow-lg border dark:border-gray-700 z-50`}
     >
-      <Link
-        className="block px-4 py-2 hover:rounded-xl hover:bg-gray-800"
-        to="/dashboard/profile"
-      >
-        My Profile
-      </Link>
-      <Link
-        className="block px-4 py-2 hover:rounded-xl hover:bg-gray-800"
-        to="/login"
-      >
-        Login
-      </Link>
-      <Link
-        className="block px-4 py-2 hover:rounded-xl hover:bg-gray-800"
-        to="/register"
-      >
-        Register
-      </Link>
-      <button className="w-full text-left px-4 py-2 text-red-500 hover:rounded-xl hover:bg-gray-800">
-        Logout
-      </button>
+      {user ? (
+        <>
+          <Link
+            className="block px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+            to="/dashboard/profile"
+          >
+            My Profile
+          </Link>
+          <button
+            className="w-full text-left px-4 py-2 text-red-500 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
+            onClick={async () => {
+              try {
+                await logOut();
+                toast.success("Logged out successfully 🚀");
+                navigate("/");
+              } catch (err) {
+                toast.error("Logout failed ⚠️");
+              }
+            }}
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <>
+          <Link
+            className="block px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+            to="/login"
+          >
+            Login
+          </Link>
+          <Link
+            className="block px-4 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+            to="/register"
+          >
+            Register
+          </Link>
+        </>
+      )}
     </div>
   );
 
@@ -120,21 +133,23 @@ const Navbar = () => {
       >
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white"
-          >
-            <Image className="w-6 h-6 text-indigo-600" />
-            Gallery
-          </Link>
+          <div className="hidden md:flex">
+            <Link
+              to="/"
+              className="flex items-center mr-6 gap-2 text-xl font-bold text-gray-900 dark:text-white"
+            >
+              <Camera className="w-6 h-6 text-indigo-600" />
+              Gallery
+            </Link>
 
-          {/* Desktop links */}
-          <div className="hidden md:flex">{navLinks}</div>
+            {/* Desktop links */}
+            {navLinks}
+          </div>
 
           {/* Desktop icons */}
           <div className="hidden md:flex items-center gap-4 relative text-white">
-            <ShoppingCart className="cursor-pointer hover:text-indigo-500" />
-            <Heart className="cursor-pointer hover:text-indigo-500" />
+            <ExplorePlanButton />
+            <FavoriteNavButton />
 
             {/* Search */}
             <div className="relative">
@@ -163,22 +178,33 @@ const Navbar = () => {
           </div>
 
           {/* Mobile right */}
-          <div className="flex md:hidden text-white gap-4">
-            <div className="relative">
-              <Search
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="cursor-pointer hover:text-indigo-500"
-              />
-              {searchOpen && (
-                <input
-                  className="absolute right-0 top-10 w-60 rounded-lg px-3 py-2 border dark:border-gray-700 bg-white dark:bg-gray-800"
-                  placeholder="Search..."
-                />
-              )}
+          <div className="flex justify-between md:hidden text-white w-full">
+            <div>
+              <Link
+                to="/"
+                className="flex items-center mr-6 gap-2 text-xl font-bold text-gray-900 dark:text-white"
+              >
+                <Camera className="w-6 h-6 text-indigo-600" />
+                Gallery
+              </Link>
             </div>
-            <button onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X /> : <Menu />}
-            </button>
+            <div className="flex justify-between items-center gap-4">
+              <div className="relative">
+                <Search
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  className="cursor-pointer hover:text-indigo-500"
+                />
+                {searchOpen && (
+                  <input
+                    className="absolute right-0 top-10 w-60 rounded-lg px-3 py-2 border dark:border-gray-700 bg-white dark:bg-gray-800"
+                    placeholder="Search..."
+                  />
+                )}
+              </div>
+              <button onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? <X /> : <Menu />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -186,17 +212,17 @@ const Navbar = () => {
       {/* Mobile menu */}
       <div
         ref={mobileMenuRef}
-        className={`md:hidden mx-8 mt-4 text-white  rounded-2xl bg-[#0d1d33ec] transition-all duration-500 overflow-hidden ${
+        className={`md:hidden mx-8 mt-4 text-white rounded-2xl bg-[#0d1d33ec] transition-all duration-500 overflow-hidden ${
           isOpen ? "max-h-[1000px]  border-2 border-blue-900" : "max-h-0"
         }`}
       >
         <div className="flex items-center justify-between px-6 pt-4">
           <div className="flex gap-4">
-            <ShoppingCart />
-            <Heart />
+            <ExplorePlanButton />
           </div>
 
           <div className="flex gap-4 relative" ref={mobileProfileRef}>
+            <FavoriteNavButton />
             <User onClick={() => setProfileOpen(!profileOpen)} />
             {profileOpen && <ProfileDropdown align="left" />}
             <ThemeToggle />

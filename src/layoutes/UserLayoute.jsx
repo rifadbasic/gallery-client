@@ -1,9 +1,20 @@
-import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router";
-import { User, Settings, LayoutDashboard, Home, X, Image } from "lucide-react";
+import { useState, useContext } from "react";
+import { Link, NavLink, Outlet, useNavigate } from "react-router";
+import {
+  User,
+  Settings,
+  LayoutDashboard,
+  Home,
+  X,
+  Image,
+  LogOut,
+} from "lucide-react";
+import { AuthContext } from "../context/AuthContext"; // ✅ import auth context
 
 const UserLayout = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const { logOut } = useContext(AuthContext); // ✅ get logOut function
 
   const links = [
     {
@@ -16,7 +27,6 @@ const UserLayout = () => {
       path: "/dashboard/profile",
       icon: <User size={20} />,
     },
-
     {
       name: "My Gallery",
       path: "/dashboard/user-gallery/my-gallery",
@@ -28,6 +38,16 @@ const UserLayout = () => {
       icon: <Settings size={20} />,
     },
   ];
+
+  // 🔹 Actual logout using AuthContext
+  const handleLogout = async () => {
+    try {
+      await logOut(); // ✅ logs out the user
+      navigate("/"); // navigate home after logout
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-[#0b1424]">
@@ -53,9 +73,18 @@ const UserLayout = () => {
           </NavLink>
         ))}
 
+        {/* 🔹 LOG OUT BUTTON (desktop) */}
+        <button
+          onClick={handleLogout} // now fully functional
+          className="mt-auto flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800 text-white dark:text-white"
+        >
+          <LogOut size={18} /> Log Out
+        </button>
+
+        {/* BACK TO HOME */}
         <Link
           to="/"
-          className="mt-auto flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <Home size={18} /> Back to Home
         </Link>
@@ -90,16 +119,28 @@ const UserLayout = () => {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `p-3 rounded-full flex justify-center items-center transition-colors duration-500
-           ${
-             isActive
-               ? "bg-indigo-600 text-white"
-               : "text-white hover:bg-indigo-500"
-           }`
+                   ${
+                     isActive
+                       ? "bg-indigo-600 text-white"
+                       : "text-white hover:bg-indigo-500"
+                   }`
                 }
               >
                 {item.icon}
               </NavLink>
             ))}
+
+            {/* 🔹 LOG OUT BUTTON (mobile) */}
+            <button
+              onClick={() => {
+                handleLogout();
+                setOpen(false); // close menu after logout
+              }}
+              className="p-3 rounded-full flex justify-center items-center text-white hover:bg-red-500 transition"
+              title="Log Out"
+            >
+              <LogOut size={20} />
+            </button>
           </div>
         )}
 

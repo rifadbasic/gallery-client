@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import MainLayoute from "../layoutes/MainLayoute";
-import NotFound from "../pages/NotFound";
+import NotFound from "../pages/Error/NotFound";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -12,6 +12,13 @@ import MyImage from "../pages/UserGallery/MyImage";
 import AddImage from "../pages/UserGallery/AddImage";
 import Account from "../pages/UserDashboard/Account";
 import Dashboard from "../pages/UserDashboard/Dashboard";
+import GalleryLayoute from "../layoutes/GalleryLayoute";
+import Gallery from "../pages/gallery/Gallery";
+import Favorites from "../pages/Favorites";
+import ExplorePlan from "../pages/ExplorePlan";
+import About from "../pages/About";
+import Forbidden from "../pages/Error/Forbidden";
+import PrivetRoute from "../AuthRouters/PrivetRoute";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +31,25 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/gallery",
+        element: <GalleryLayoute />,
+        children: [
+          {
+            path: "/gallery",
+            element: <Gallery />,
+          },
+        ],
+      },
+      {
+        path: "/about",
+        element: <About />,
+      },
+      {
+        path: "/favorites",
+        element: <Favorites />,
+      },
+      { path: "/subscription", element: <PrivetRoute><ExplorePlan /></PrivetRoute> },
+      {
         path: "/login",
         element: <Login />,
       },
@@ -34,27 +60,68 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/forbidden",
+    element: <Forbidden />,
+  },
+  {
     path: "/dashboard",
     errorElement: <NotFound />,
     element: <UserLayoute />,
     children: [
       {
         path: "/dashboard",
-        element: <Dashboard />,
+        element: (
+          <PrivetRoute>
+            <Dashboard />
+          </PrivetRoute>
+        ),
       },
-      { path: "profile", element: <UserProfile /> },
+      {
+        path: "profile",
+        element: (
+          <PrivetRoute>
+            <UserProfile />
+          </PrivetRoute>
+        ),
+      },
       {
         path: "user-gallery",
         errorElement: <NotFound />,
         element: <UserGalleryLayout />,
         children: [
-          { path: "my-gallery", element: <MyGallery /> },
-          { path: "my-image", element: <MyImage /> },
-          { path: "add-image", element: <AddImage /> },
-        ]
-      },{
+          {
+            path: "my-gallery",
+            element: (
+              <PrivetRoute>
+                <MyGallery />
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "my-image",
+            element: (
+              <PrivetRoute>
+                <MyImage />
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "add-image",
+            element: (
+              <PrivetRoute>
+                <AddImage />
+              </PrivetRoute>
+            ),
+          },
+        ],
+      },
+      {
         path: "settings",
-        element: <Account />,
+        element: (
+          <PrivetRoute>
+            <Account />
+          </PrivetRoute>
+        ),
       },
     ],
   },

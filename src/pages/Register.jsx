@@ -1,29 +1,126 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
+import useAxios from "../hooks/useAxios";
 import { Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const { googleSignIn, createUser, updateUser } = useContext(AuthContext);
 
-  const handleRegister = (e) => {
+  const axios = useAxios();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redirect path (default to homepage)
+  const from = location.state?.from || "/";
+  console.log(from)
+
+  const handleRegister = async (e) => {
     e.preventDefault();
     const form = e.target;
 
-    const userData = {
-      name: form.name.value,
-      email: form.email.value,
-      phone: form.phone.value,
-      photo: form.photo.files[0],
-      password: form.password.value,
-      confirm: form.confirm.value,
-    };
+    const name = form.name.value;
+    const email = form.email.value;
+    const phone = form.phone.value;
+    const password = form.password.value;
+    const confirm = form.confirm.value;
+    const photoFile = form.photo.files[0];
 
-    console.log(userData);
+    if (password !== confirm) {
+      toast.error("Passwords do not match 😬");
+      return;
+    }
+
+    try {
+      toast.loading("Creating account...");
+
+      // 1️⃣ Upload image to ImgBB
+      const fd = new FormData();
+      fd.append("image", photoFile);
+
+      const imgRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${
+          import.meta.env.VITE_image_uplode_key
+        }`,
+        fd
+      );
+
+      const photoURL = imgRes.data.data.url;
+
+      // 2️⃣ Create user in Firebase
+      const result = await createUser(email, password);
+      const firebaseUser = result.user;
+
+      // 3️⃣ Update Firebase profile
+      await updateUser({
+        displayName: name,
+        photoURL: photoURL,
+      });
+
+      // 4️⃣ Save user in your database
+      const userData = {
+        name,
+        email,
+        phone,
+        photo: photoURL,
+        password,
+        provider: "email",
+      };
+
+      await axios.post("/users", userData);
+
+      toast.dismiss();
+      toast.success("Account created successfully 🚀");
+
+      // 🔹 Navigate to homepage or previous route
+      navigate(from, { replace: true });
+    } catch (err) {
+      toast.dismiss();
+      toast.error("Registration failed. Try again.");
+      console.log(err);
+    }
   };
 
-  const handleGoogleRegister = () => {
-    console.log("Google register clicked");
+  const handleGoogleRegister = async () => {
+    try {
+      toast.loading("Signing in with Google...");
+
+      const result = await googleSignIn();
+      const user = result.user;
+
+      // Check if user exists in DB
+      const res = await axios.get(`/users/${user.email}`);
+
+      if (!res.data) {
+        // User not found → Register automatically
+        const googleUser = {
+          name: user.displayName,
+          email: user.email,
+          phone: "",
+          photo: user.photoURL,
+          password: "google_auth",
+          provider: "google",
+        };
+
+        await axios.post("/users", googleUser);
+        toast.dismiss();
+        toast.success("Account created with Google ✨");
+      } else {
+        toast.dismiss();
+        toast.success("Logged in successfully 🚀");
+      }
+
+      // 🔹 Navigate to homepage or previous route
+      navigate(from, { replace: true });
+    } catch (err) {
+      toast.dismiss();
+      toast.error("Google sign-in failed.");
+      console.log(err);
+    }
   };
 
   return (
