@@ -18,7 +18,7 @@ const plans = [
     price: 0,
     display: "Free",
     features: [
-      "Access to 50+ gallery items",
+      "Access regular gallery items",
       "Basic filters & search",
       "Community support chat",
     ],
@@ -30,7 +30,7 @@ const plans = [
     price: 999,
     display: "$9.99 / month",
     features: [
-      "Unlimited gallery access",
+      "Add your own images to gallery",
       "Advanced filters & search",
       "Save favorite collections",
       "Monthly featured artist content",
@@ -38,15 +38,15 @@ const plans = [
     accent: "from-yellow-400 to-yellow-600",
   },
   {
-    name: "Curator",
+    name: "Creator",
     icon: <FaGem className="text-purple-600 text-5xl" />,
     price: 1999,
     display: "$19.99 / month",
     features: [
       "All Artist features",
-      "Priority content curation",
+      "Premium image access",
       "Exclusive gallery previews",
-      "1-on-1 curator support",
+      "1-on-1 creator support",
     ],
     accent: "from-purple-500 to-indigo-600",
   },
@@ -90,7 +90,7 @@ const ExplorePlan = () => {
     if (
       (amount === 0 && userStatus === "explorer") ||
       (amount === 999 && userStatus === "artist") ||
-      (amount === 1999 && userStatus === "curator")
+      (amount === 1999 && userStatus === "creator")
     ) {
       return;
     }
@@ -136,7 +136,7 @@ const ExplorePlan = () => {
           const isCurrentPlan =
             (plan.price === 0 && userStatus === "explorer") ||
             (plan.price === 999 && userStatus === "artist") ||
-            (plan.price === 1999 && userStatus === "curator");
+            (plan.price === 1999 && userStatus === "creator");
 
           return (
             <motion.div

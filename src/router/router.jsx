@@ -20,6 +20,7 @@ import About from "../pages/About";
 import Forbidden from "../pages/Error/Forbidden";
 import PrivetRoute from "../AuthRouters/PrivetRoute";
 import Payment from "../pages/Payment";
+import ArtistUserRoute from "../AuthRouters/AtristUserRoute";
 
 const router = createBrowserRouter([
   {
@@ -64,8 +65,7 @@ const router = createBrowserRouter([
             <Payment />
           </PrivetRoute>
         ),
-      },
-      {
+      },      {
         path: "/login",
         element: <Login />,
       },
@@ -109,7 +109,9 @@ const router = createBrowserRouter([
             path: "my-gallery",
             element: (
               <PrivetRoute>
-                <MyGallery />
+                <ArtistUserRoute>
+                  <MyGallery />
+                </ArtistUserRoute>
               </PrivetRoute>
             ),
           },
@@ -117,7 +119,9 @@ const router = createBrowserRouter([
             path: "my-image",
             element: (
               <PrivetRoute>
+                <ArtistUserRoute>
                 <MyImage />
+                </ArtistUserRoute>
               </PrivetRoute>
             ),
           },
@@ -125,7 +129,9 @@ const router = createBrowserRouter([
             path: "add-image",
             element: (
               <PrivetRoute>
+                <ArtistUserRoute> 
                 <AddImage />
+                </ArtistUserRoute>
               </PrivetRoute>
             ),
           },

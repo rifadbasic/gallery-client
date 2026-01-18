@@ -4,8 +4,7 @@ import { Filter } from "lucide-react";
 import { useState } from "react";
 
 const GalleryLayout = () => {
-  const { filters, updateFilters, resetFilters, filterOptions } = useGallery();
-  const [showFilters, setShowFilters] = useState(false);
+  const { filters, updateFilters, resetFilters, filterOptions = { category: [], status: [], role: [] } } = useGallery();  const [showFilters, setShowFilters] = useState(false);
 
   return (
     <div className="h-screen flex flex-col">

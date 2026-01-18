@@ -11,18 +11,26 @@ const FavoriteButton = ({ image }) => {
   const axios = useAxios();
   const { toggleFavorite } = useGallery();
 
+  const isWoner = image.userEmail === user?.email;
+
   const [isFav, setIsFav] = useState(false);
+
   useEffect(() => {
-    if (user?.email && Array.isArray(image.favorites)) {
+    if (!user?.email) {
+      setIsFav(false);
+      return;
+    }
+
+    if (Array.isArray(image.favorites)) {
       const liked = image.favorites.some(
         (f) =>
           (typeof f === "string" && f === user.email) ||
-          (f.email && f.email === user.email),
+          (f?.email && f.email === user.email),
       );
 
       setIsFav(liked);
     }
-  }, [user, image.favorites]);
+  }, [user?.email, image.favorites]);
 
   // console.log(isFav);
 
@@ -47,14 +55,16 @@ const FavoriteButton = ({ image }) => {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className={`p-2 rounded-full shadow transition ${
-        isFav ? "bg-red-500 text-white" : "bg-white text-black"
-      }`}
-    >
-      <Heart size={18} fill={isFav ? "white" : "none"} />
-    </button>
+    <div className={isWoner ? "opacity-0 pointer-events-none" : " opacity-100"}>
+      <button
+        onClick={handleClick}
+        className={`p-2 rounded-full shadow transition ${
+          isFav ? "bg-red-500 text-white" : "bg-white text-black"
+        }`}
+      >
+        <Heart size={18} fill={isFav ? "white" : "none"} />
+      </button>
+    </div>
   );
 };
 

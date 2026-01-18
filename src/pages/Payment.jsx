@@ -4,8 +4,7 @@ import React from 'react';
 import CheckoutForm from '../components/CheckoutForm';
 
 
-const stripePromise = loadStripe(`${import.meta.env.VITE_Publishable_Key}`);
-
+const stripePromise = loadStripe(import.meta.env.VITE_Publishable_Key);
 const Payment = ( ) => {
 
 

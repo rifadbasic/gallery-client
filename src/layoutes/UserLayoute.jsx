@@ -9,14 +9,25 @@ import {
   Image,
   LogOut,
 } from "lucide-react";
-import { AuthContext } from "../context/AuthContext"; // ✅ import auth context
+import { AuthContext } from "../context/AuthContext";
+import useUserStatus from "../hooks/useUserStatus";
 
 const UserLayout = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { logOut } = useContext(AuthContext); // ✅ get logOut function
+  const { logOut } = useContext(AuthContext);
+  const { userStatus:status } = useUserStatus();
 
-  const links = [
+  // console.log(user);
+
+  
+
+
+
+  const userStatus = status;
+  // console.log(userStatus)
+
+  let links = [
     {
       name: "Dashboard",
       path: "/dashboard",
@@ -27,17 +38,21 @@ const UserLayout = () => {
       path: "/dashboard/profile",
       icon: <User size={20} />,
     },
-    {
-      name: "My Gallery",
-      path: "/dashboard/user-gallery/my-gallery",
-      icon: <Image size={20} />,
-    },
+
     {
       name: "Account Settings",
       path: "/dashboard/settings",
       icon: <Settings size={20} />,
     },
   ];
+
+  if (userStatus === "creator" || userStatus === "artist") {
+    links.splice(2, 0, {
+      name: "My Gallery",
+      path: "/dashboard/user-gallery/my-gallery",
+      icon: <Image size={20} />,
+    });
+  }
 
   // 🔹 Actual logout using AuthContext
   const handleLogout = async () => {

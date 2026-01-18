@@ -104,7 +104,7 @@ const MyImage = () => {
               className="bg-white dark:bg-[#0d1d33] rounded-xl shadow-lg overflow-hidden"
             >
               <img
-                src={img.img}
+                src={img.originalImage}
                 alt={img.name}
                 className="h-56 w-full object-cover"
               />

@@ -5,11 +5,11 @@ import useAxios from "../../hooks/useAxios";
 import { AuthContext } from "../../context/AuthContext"; // Firebase or your auth context
 
 const initialState = {
-  img: "",
+  originalImage: "",
   name: "",
   description: "",
   category: "Photography",
-  role: "regular",
+  role: "Regular",
   status: "Pending",
   price: "",
   discountPercent: 0,
@@ -40,7 +40,7 @@ const AddImage = () => {
       }`;
 
       const res = await axios.post(url, fd);
-      setFormData((prev) => ({ ...prev, img: res.data.data.url }));
+      setFormData((prev) => ({ ...prev, originalImage: res.data.data.url }));
       toast.success("Image uploaded successfully 🌿");
     } catch {
       toast.error("Image upload failed. Please try again.");
@@ -82,7 +82,7 @@ const AddImage = () => {
     e.preventDefault();
     if (submitting) return;
 
-    if (!formData.img) {
+    if (!formData.originalImage) {
       toast.error("Please upload an image first!");
       return;
     }
@@ -96,9 +96,18 @@ const AddImage = () => {
 
     try {
       const payload = {
-        ...formData,
+        img: formData.originalImage,
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        role: formData.role,
+        status: formData.status,
+        price: formData.price,
+        discountPercent: formData.discountPercent,
+        finalPrice: formData.finalPrice,
+        likes: formData.likes,
         createdAt: new Date(),
-        userEmail: authUser.email, // attach user info
+        userEmail: authUser.email,
         userName: authUser.name || authUser.displayName,
         userPhoto: authUser.photo || authUser.photoURL,
       };
@@ -140,9 +149,9 @@ const AddImage = () => {
       >
         {/* Image Upload */}
         <div className="md:col-span-2">
-          {formData.img && (
+          {formData.originalImage && (
             <img
-              src={formData.img}
+              src={formData.originalImage}
               alt="preview"
               className="mt-3 h-40 w-40 object-cover rounded-lg bg-[#0d1d33] text-white"
             />
@@ -211,8 +220,6 @@ const AddImage = () => {
             <option value="Premium">Premium</option>
           </select>
         </div>
-
-        
 
         {/* Price */}
         <div>

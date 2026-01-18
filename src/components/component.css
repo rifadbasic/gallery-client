@@ -15,3 +15,13 @@ title.text{
     background-color: #8b8b8bf5;
     color: #f8f8f8;
 }
+
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}

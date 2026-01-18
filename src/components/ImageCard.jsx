@@ -21,7 +21,11 @@ const ImageCard = ({ img, lastRef }) => {
   const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
-    if (user?.email && Array.isArray(img.likes)) {
+    if (!user?.email) {
+      setIsLiked(false);
+      return;
+    }
+    if (Array.isArray(img.likes)) {
       const liked = img.likes.some(
         (l) =>
           (typeof l === "string" && l === user.email) ||
@@ -31,7 +35,6 @@ const ImageCard = ({ img, lastRef }) => {
       setIsLiked(liked);
     }
   }, [user, img.likes]);
-
   const handleOpenModal = () => {
     if (!user) return navigate("/login");
     setModalOpen(true);
@@ -71,7 +74,7 @@ const ImageCard = ({ img, lastRef }) => {
 
         {/* Image */}
         <img
-          src={img.img}
+          src={img.watermarkedImage}
           alt={img.name}
           className="w-full h-56 object-cover cursor-pointer"
           onClick={handleOpenModal}

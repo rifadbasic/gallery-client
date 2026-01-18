@@ -116,9 +116,8 @@ const Account = () => {
             />
             <InfoRow
               label="Member Since"
-              value={new Date(accountData?.createdAt).toLocaleDateString()}
-            />
-          </Section>
+              value={accountData?.createdAt ? new Date(accountData.createdAt).toLocaleDateString() : "Unknown"}
+            />          </Section>
 
           <Section title="Security" icon={<Shield size={18} />}>
             <ActionRow

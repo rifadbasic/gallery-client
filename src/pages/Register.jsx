@@ -112,8 +112,10 @@ const Register = () => {
 
         // 3️⃣ Redirect after login
         navigate(from, { replace: true });
-      }
-    } catch (err) {
+      } else {
+        toast.dismiss();
+        toast.error(res.data.message || "Google sign-in failed.");
+      }    } catch (err) {
       toast.dismiss();
       toast.error("Google sign-in failed.");
       console.error(err);

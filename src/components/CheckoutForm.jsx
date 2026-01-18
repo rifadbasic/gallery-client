@@ -1,4 +1,3 @@
-// checkoutform.jsx (updated)
 import { useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import useAuth from "../hooks/useAuth";
@@ -6,14 +5,61 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { FaCamera, FaPalette, FaGem } from "react-icons/fa";
+
+const plans = [
+  {
+    name: "Explorer",
+    icon: <FaCamera className="text-blue-500 text-5xl" />,
+    price: 0,
+    display: "Free",
+    features: [
+      "Access regular gallery items",
+      "Basic filters & search",
+      "Community support chat",
+    ],
+    accent: "from-blue-400 to-blue-600",
+    duration: "Unlimited",
+  },
+  {
+    name: "Artist",
+    icon: <FaPalette className="text-yellow-500 text-5xl" />,
+    price: 999,
+    display: "$9.99 / month",
+    features: [
+      "Add your own images to gallery",
+      "Advanced filters & search",
+      "Save favorite collections",
+      "Monthly featured artist content",
+    ],
+    accent: "from-yellow-400 to-yellow-600",
+    duration: "1 Month",
+  },
+  {
+    name: "Creator",
+    icon: <FaGem className="text-purple-600 text-5xl" />,
+    price: 1999,
+    display: "$19.99 / month",
+    features: [
+      "All Artist features",
+      "Premium image access",
+      "Exclusive gallery previews",
+      "1-on-1 creator support",
+    ],
+    accent: "from-purple-500 to-indigo-600",
+    duration: "1 Month",
+  },
+];
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
-  const { id, amount } = useParams();
+  const { id, amount: amountParam } = useParams();
+  const amount = Number(amountParam);
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState("");
 
@@ -91,7 +137,7 @@ const CheckoutForm = () => {
           date: new Date(),
         });
 
-        mutation.mutate({
+        await mutation.mutateAsync({
           email: userData.email,
           amount,
           transactionId,
@@ -99,31 +145,70 @@ const CheckoutForm = () => {
       }
     } catch (err) {
       Swal.fire("Payment Error", err.message, "error");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
+  // find selected plan based on amount
+  const selectedPlan = plans.find((p) => p.price === amount) || plans[0];
+
   return (
-    <div className="min-h-[80vh] flex justify-center items-center">
-      <div className="w-full max-w-md bg-white shadow-xl border-1 border-indigo-200 rounded-2xl p-6 md:p-8">
-        <h2 className="text-xl md:text-2xl font-semibold text-center text-indigo-700 mb-4">
-          {amount == 0 ? "Activate Free Plan" : "Complete Your Payment"}
+    <div className="min-h-[80vh] flex justify-center items-center p-4 ">
+      <div className="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-4 md:p-10 border border-indigo-200 mt-18">
+        <h2 className="text-xl md:text-2xl font-bold text-center text-indigo-700 mb-6">
+          {amount === 0 ? "Activate Free Plan" : "your subscription Payment"}
         </h2>
 
-        {amount == 0 ? (
+        {/* User & Plan Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="space-y-2">
+            <p className="text-gray-600">
+              <span className="font-semibold">Name:</span> {userData.name}
+            </p>
+            <p className="text-gray-600">
+              <span className="font-semibold">Email:</span> {userData.email}
+            </p>
+            <p className="text-gray-600">
+              <span className="font-semibold">Subscription:</span>{" "}
+              {selectedPlan.name}
+            </p>
+            <p className="text-gray-600">
+              <span className="font-semibold">Duration:</span>{" "}
+              {selectedPlan.duration}
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-r p-4 rounded-xl from-indigo-100 to-indigo-200">
+            <div className="flex items-center gap-3 mb-2">
+              {selectedPlan.icon}
+              <h3 className="text-xl font-semibold">{selectedPlan.name}</h3>
+            </div>
+            <p className="text-indigo-700 font-bold text-lg">
+              {selectedPlan.display}
+            </p>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-gray-700">
+              {selectedPlan.features.map((f, idx) => (
+                <li key={idx}>{f}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Payment Form */}
+        {amount === 0 ? (
           <button
             onClick={handleFreeSubscription}
             disabled={loading}
-            className="w-full py-2 px-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium transition duration-300"
+            className="w-full py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-medium text-lg transition duration-300"
           >
             {loading ? "Processing..." : "Activate Free Plan"}
           </button>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="p-3 border-2 border-indigo-300 rounded-xl transition-all focus-within:border-indigo-500 bg-white">
+            <div className="p-4 border-2 border-indigo-300 rounded-xl transition-all focus-within:border-indigo-500 bg-white">
               <CardElement
-                className="text-sm"
+                className="text-base"
                 options={{
                   style: {
                     base: {
@@ -140,7 +225,7 @@ const CheckoutForm = () => {
             <button
               type="submit"
               disabled={!stripe || loading}
-              className={`w-full py-2 px-4 rounded-xl font-medium text-white transition duration-300 ${
+              className={`w-full py-3 rounded-xl font-medium text-white text-lg transition duration-300 ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-indigo-600 hover:bg-indigo-700"
@@ -152,7 +237,9 @@ const CheckoutForm = () => {
         )}
 
         {paymentSuccess && (
-          <p className="text-green-600 text-center mt-2">{paymentSuccess}</p>
+          <p className="text-green-600 text-center mt-4 text-lg">
+            {paymentSuccess}
+          </p>
         )}
       </div>
     </div>

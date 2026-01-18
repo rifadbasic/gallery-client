@@ -19,8 +19,7 @@ export default function MainLayoute() {
 
     const loadFavorites = async () => {
       try {
-        const res = await axios.get(`/users/${user.email}/favorites`);
-        setInitialFavorites(res.data); // 🔥 খুব গুরুত্বপূর্ণ লাইন
+        const res = await axios.get(`/users/${encodeURIComponent(user.email)}/favorites`);        setInitialFavorites(res.data); // 🔥 খুব গুরুত্বপূর্ণ লাইন
       } catch (err) {
         console.error("Load favorites failed:", err);
       }

@@ -60,17 +60,18 @@ const UserProfile = () => {
   const statusStyles = {
     normal: "bg-gray-700 text-white",
     explorer: "bg-gray-700 text-white",
+    free: "bg-gray-700 text-white",
     artist: "bg-yellow-500 text-black",
-    curator: "bg-purple-600 text-white",
+    creator: "bg-purple-600 text-white",
   };
 
   const statusLabel = {
     normal: "Normal User",
     explorer: "explorer",
+    free: "Free User",
     artist: "artist",
-    curator: "curator",
+    creator: "creator",
   };
-
   // ====== PROFILE DATA ======
   const profileData = {
     name: user.name,
@@ -103,7 +104,7 @@ const UserProfile = () => {
             <div
               className={`absolute top-4 right-4 flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg ${statusStyles[userStatus]}`}
             >
-              {userStatus === "curator" && <Crown size={16} />}
+              {userStatus === "creator" && <Crown size={16} />}
               {userStatus === "artist" && <Star size={16} />}
               {(userStatus === "explorer" || userStatus === "free") && (
                 <User size={16} />
