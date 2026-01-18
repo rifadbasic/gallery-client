@@ -10,7 +10,7 @@ const initialState = {
   description: "",
   category: "Photography",
   role: "regular",
-  status: "Unsold",
+  status: "Pending",
   price: "",
   discountPercent: 0,
   finalPrice: "",
@@ -60,19 +60,20 @@ const AddImage = () => {
     setFormData((prev) => ({
       ...prev,
       price: validPrice,
-      finalPrice: finalPrice.toFixed(2),
+      finalPrice: Math.floor(finalPrice),
     }));
   };
 
   const handleDiscountChange = (e) => {
     const discount = Number(e.target.value);
     const price = Number(formData.price);
+    // istorage a round final price
     const finalPrice = price - (price * discount) / 100;
 
     setFormData((prev) => ({
       ...prev,
       discountPercent: discount,
-      finalPrice: finalPrice.toFixed(2),
+      finalPrice: Math.floor(finalPrice),
     }));
   };
 
@@ -128,7 +129,7 @@ const AddImage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6">
+    <div className="max-w-4xl md:max-w-6xl mx-auto p-2 md:p-6">
       <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
         Add New Image to Gallery
       </h1>
@@ -139,34 +140,37 @@ const AddImage = () => {
       >
         {/* Image Upload */}
         <div className="md:col-span-2">
+          {formData.img && (
+            <img
+              src={formData.img}
+              alt="preview"
+              className="mt-3 h-40 w-40 object-cover rounded-lg bg-[#0d1d33] text-white"
+            />
+          )}
+
           <label className="block mb-2 text-gray-700 dark:text-gray-300">
-            Upload Image
+            Upload Image <span className="text-red-500">*</span>
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
           />
           {uploading && (
             <p className="text-sm mt-2 text-indigo-500">Uploading...</p>
-          )}
-          {formData.img && (
-            <img
-              src={formData.img}
-              alt="preview"
-              className="mt-3 h-40 w-40 object-cover rounded-lg"
-            />
           )}
         </div>
 
         {/* Name */}
         <div>
-          <label className="block mb-2">Image Name</label>
+          <label className="block mb-2">
+            Image Name <span className="text-red-500">*</span>
+          </label>
           <input
             type="text"
             placeholder="Sunset in Cox's Bazar"
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -175,9 +179,11 @@ const AddImage = () => {
 
         {/* Category */}
         <div>
-          <label className="block mb-2">Category</label>
+          <label className="block mb-2">
+            Category <span className="text-red-500">*</span>
+          </label>
           <select
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
             value={formData.category}
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
@@ -193,40 +199,30 @@ const AddImage = () => {
 
         {/* Role */}
         <div>
-          <label className="block mb-2">Image Role</label>
+          <label className="block mb-2">
+            Image Role <span className="text-red-500">*</span>
+          </label>
           <select
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
           >
-            <option value="regular">Regular</option>
-            <option value="premium">Premium</option>
+            <option value="Regular">Global</option>
+            <option value="Premium">Premium</option>
           </select>
         </div>
 
-        {/* Status */}
-        <div>
-          <label className="block mb-2">Status</label>
-          <select
-            className="w-full border p-2 rounded-lg"
-            value={formData.status}
-            onChange={(e) =>
-              setFormData({ ...formData, status: e.target.value })
-            }
-          >
-            <option value="Unsold">Unsold</option>
-            <option value="Sold">Sold</option>
-            <option value="Global">Global</option>
-          </select>
-        </div>
+        
 
         {/* Price */}
         <div>
-          <label className="block mb-2">Price (৳)</label>
+          <label className="block mb-2">
+            Price (৳) <span className="text-red-500">*</span>
+          </label>
           <input
             type="number"
             min="0"
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
             value={formData.price}
             onChange={handlePriceChange}
             required
@@ -240,18 +236,18 @@ const AddImage = () => {
             type="number"
             min="0"
             max="100"
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
             value={formData.discountPercent}
             onChange={handleDiscountChange}
           />
         </div>
 
         {/* Final Price */}
-        <div className="md:col-span-2">
+        <div className="block mb-2">
           <label className="block mb-2">Final Price (৳)</label>
           <input
             type="text"
-            className="w-full border p-2 rounded-lg bg-gray-100"
+            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
             value={formData.finalPrice}
             readOnly
           />
@@ -268,7 +264,6 @@ const AddImage = () => {
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
-            required
           />
         </div>
 

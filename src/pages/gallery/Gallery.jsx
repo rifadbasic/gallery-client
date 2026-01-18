@@ -2,8 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import useAxios from "../../hooks/useAxios";
 import ImageCard from "../../components/ImageCard";
 import { useGallery } from "../../context/GalleryContext";
-
-
+// import useAuth from "../../hooks/useAuth";
 
 const Gallery = () => {
   const { filters } = useGallery();
@@ -14,7 +13,7 @@ const Gallery = () => {
   const observerRef = useRef(null);
   const fetchingRef = useRef(false);
   const axios = useAxios();
-  // const user = useRandomUser();
+  // const { user } = useAuth();
 
   // refetch when filters change
   useEffect(() => {
@@ -29,12 +28,12 @@ const Gallery = () => {
     setLoading(true);
 
     try {
-      // pass filters as query params
+      const { category = "All", status = "All", role = "All" } = filters;
+
       const query = new URLSearchParams({ page: pageNum });
-      if (filters.category !== "All")
-        query.append("category", filters.category);
-      if (filters.status !== "All") query.append("status", filters.status);
-      if (filters.role !== "All") query.append("role", filters.role);
+      if (category && category !== "All") query.append("category", category);
+      if (status && status !== "All") query.append("status", status);
+      if (role && role !== "All") query.append("role", role);
 
       const res = await axios.get(`/images?${query.toString()}`);
       const newImages = Array.isArray(res.data?.images) ? res.data.images : [];
@@ -71,12 +70,11 @@ const Gallery = () => {
 
       if (node) observerRef.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, hasMore],
   );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {images.map((img, index) => {
           const isLast = index === images.length - 1;
@@ -92,6 +90,11 @@ const Gallery = () => {
       {loading && (
         <div className="text-center text-gray-500 mt-6">
           Loading more images...
+        </div>
+      )}
+      {!loading && images.length === 0 && (
+        <div className="text-center text-gray-500 mt-6">
+          No images found.
         </div>
       )}
       {!hasMore && images.length > 0 && (

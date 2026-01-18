@@ -1,102 +1,199 @@
-import { Check } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  FaCamera,
+  FaPalette,
+  FaGem,
+  FaArrowRight,
+  FaCheckCircle,
+} from "react-icons/fa";
+import { useNavigate } from "react-router";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAuth from "../hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
 
 const plans = [
   {
-    id: 1,
-    name: "Starter",
-    price: "Free",
-    subtitle: "For dreamers who just arrived",
+    name: "Explorer",
+    icon: <FaCamera className="text-blue-500 text-5xl" />,
+    price: 0,
+    display: "Free",
     features: [
-      "View all public images",
-      "Save up to 5 favorites",
-      "Basic gallery access",
-      "Standard support",
+      "Access to 50+ gallery items",
+      "Basic filters & search",
+      "Community support chat",
     ],
-    button: "Get Started",
-    highlight: false,
+    accent: "from-blue-400 to-blue-600",
   },
   {
-    id: 2,
-    name: "Creator",
-    price: "$9 / month",
-    subtitle: "For artists and visionaries",
+    name: "Artist",
+    icon: <FaPalette className="text-yellow-500 text-5xl" />,
+    price: 999,
+    display: "$9.99 / month",
     features: [
-      "Unlimited favorites",
-      "Upload images",
-      "Early access to new features",
-      "Priority support",
-      "Profile customization",
+      "Unlimited gallery access",
+      "Advanced filters & search",
+      "Save favorite collections",
+      "Monthly featured artist content",
     ],
-    button: "Choose Creator",
-    highlight: true,
+    accent: "from-yellow-400 to-yellow-600",
   },
   {
-    id: 3,
-    name: "Pro Gallery",
-    price: "$19 / month",
-    subtitle: "For professionals and brands",
+    name: "Curator",
+    icon: <FaGem className="text-purple-600 text-5xl" />,
+    price: 1999,
+    display: "$19.99 / month",
     features: [
-      "Everything in Creator",
-      "Featured in gallery",
-      "Advanced analytics",
-      "Custom branding",
-      "Dedicated support",
+      "All Artist features",
+      "Priority content curation",
+      "Exclusive gallery previews",
+      "1-on-1 curator support",
     ],
-    button: "Go Pro",
-    highlight: false,
+    accent: "from-purple-500 to-indigo-600",
   },
 ];
 
 const ExplorePlan = () => {
-  return (
-    <div className="min-h-screen  px-4 py-16">
-      <div className="max-w-7xl mx-auto text-center mb-12 mt-12">
-        <h1 className="text-3xl md:text-4xl font-bold ">
-          Explore Your Plan 🌠
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-3 max-w-2xl mx-auto">
-          Choose a path that matches your journey — whether you’re just
-          wandering, creating, or ruling the gallery.
-        </p>
+  const { user, loading, logeOut } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
+
+  const email = user?.email;
+  // console.log(email)
+
+  document.title = "Gallery Plans | Explore";
+
+  const {
+    data: userData = {},
+    isLoading,
+    error,
+  } = useQuery({
+    enabled: !!user?.email,
+    queryKey: ["user-payment", user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/subscriptions/${email}`);
+      return res.data;
+    },
+  });
+
+  const userStatus = (userData.user_status || "explorer").toLowerCase();
+
+  const handleSubscribe = (amount, id) => {
+    if (loading || isLoading) return;
+
+    if (userData?.email !== user?.email) {
+      logeOut();
+      navigate("/login");
+      return;
+    }
+
+    // Prevent subscribing to the same plan
+    if (
+      (amount === 0 && userStatus === "explorer") ||
+      (amount === 999 && userStatus === "artist") ||
+      (amount === 1999 && userStatus === "curator")
+    ) {
+      return;
+    }
+
+    navigate(`/payment/${id}/${amount}`);
+  };
+
+  if (isLoading || loading)
+    return (
+      <div className="h-screen flex items-center justify-center text-lg">
+        Loading gallery plans...
       </div>
+    );
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`rounded-2xl border-1 border-blue-300 p-6 shadow-lg transition-transform hover:scale-105 ${
-              plan.highlight
-                ? "bg-indigo-600 text-white scale-105"
-                : "bg-white dark:bg-[#0d1d33] text-gray-900 dark:text-white"
-            }`}
-          >
-            <h2 className="text-2xl font-bold">{plan.name}</h2>
-            <p className="mt-1 text-sm opacity-80">{plan.subtitle}</p>
+  if (error)
+    return (
+      <div className="text-center text-red-600 mt-20">
+        Error: {error.message}
+      </div>
+    );
 
-            <div className="text-3xl font-extrabold my-4">
-              {plan.price}
-            </div>
+  return (
+    <div className="min-h-screen  py-16 px-4 md:px-8">
+      {/* HERO SECTION */}
+      <motion.div
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center max-w-3xl mx-auto mb-16 mt-12"
+      >
+        <h2 className="text-3xl md:text-4xl font-extrabold text-indigo-700 mb-4">
+          Unlock Your Gallery World
+        </h2>
+        <p className=" text-lg md:text-xl">
+          Pick a plan to explore, create, and curate stunning collections. Your
+          gallery journey starts here.
+        </p>
+      </motion.div>
 
-            <ul className="space-y-3 mb-6">
-              {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <Check size={18} />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
+      {/* GALLERY-STYLE CARD GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+        {plans.map((plan, idx) => {
+          const isCurrentPlan =
+            (plan.price === 0 && userStatus === "explorer") ||
+            (plan.price === 999 && userStatus === "artist") ||
+            (plan.price === 1999 && userStatus === "curator");
 
-            <button
-              className={`w-full py-2 rounded-xl font-semibold transition ${
-                plan.highlight
-                  ? "bg-white text-indigo-600 hover:bg-gray-100"
-                  : "bg-indigo-600 text-white hover:bg-indigo-500"
-              }`}
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: idx * 0.15 }}
+              className="relative rounded-3xl overflow-hidden shadow-2xl  border border-gray-700 transform transition-all duration-300 hover:scale-[1.03]"
             >
-              {plan.button}
-            </button>
-          </div>
-        ))}
+              {/* Gradient Top Bar */}
+              <div
+                className={`h-2 w-full bg-gradient-to-r ${plan.accent}`}
+              ></div>
+
+              {/* Current Plan Badge */}
+              {isCurrentPlan && (
+                <div className="absolute top-4 right-4 bg-green-600 text-white text-sm px-3 py-1 rounded-full shadow-md">
+                  Active Plan
+                </div>
+              )}
+
+              {/* Card Content */}
+              <div className="p-8 text-center flex flex-col items-center gap-4">
+                {plan.icon}
+
+                <h3 className="text-2xl font-bold ">
+                  {plan.name}
+                </h3>
+
+                <p className="text-indigo-600 font-semibold">{plan.display}</p>
+
+                <ul className=" text-sm mt-4 space-y-2 text-left">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <FaCheckCircle className="text-green-500" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* BUTTON: Disabled if user is already on this plan */}
+                <button
+                  disabled={isCurrentPlan}
+                  onClick={() => handleSubscribe(plan.price, userData._id)}
+                  className={`mt-6 w-full flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium transition ${
+                    isCurrentPlan
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700"
+                  }`}
+                >
+                  {isCurrentPlan ? "Already Have This Plan" : "Subscribe"}
+                  {!isCurrentPlan && <FaArrowRight />}
+                </button>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

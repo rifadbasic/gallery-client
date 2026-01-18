@@ -73,21 +73,22 @@ const UserLayout = () => {
           </NavLink>
         ))}
 
-        {/* 🔹 LOG OUT BUTTON (desktop) */}
-        <button
-          onClick={handleLogout} // now fully functional
-          className="mt-auto flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800 text-white dark:text-white"
-        >
-          <LogOut size={18} /> Log Out
-        </button>
-
-        {/* BACK TO HOME */}
-        <Link
-          to="/"
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <Home size={18} /> Back to Home
-        </Link>
+        <div className="flex flex-col mt-auto">
+          {/* BACK TO HOME */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <Home size={18} /> Back to Home
+          </Link>
+          {/* 🔹 LOG OUT BUTTON (desktop) */}
+          <button
+            onClick={handleLogout} // now fully functional
+            className="my-4 flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-red-500 hover:text-white  text-red-500"
+          >
+            <LogOut size={18} /> Log Out
+          </button>
+        </div>
       </aside>
 
       {/* ===== MAIN CONTENT ===== */}
@@ -136,7 +137,7 @@ const UserLayout = () => {
                 handleLogout();
                 setOpen(false); // close menu after logout
               }}
-              className="p-3 rounded-full flex justify-center items-center text-white hover:bg-red-500 transition"
+              className="p-3 rounded-full flex justify-center items-center text-red-500 hover:text-white hover:bg-red-500 transition"
               title="Log Out"
             >
               <LogOut size={20} />

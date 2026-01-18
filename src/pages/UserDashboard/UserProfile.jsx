@@ -1,20 +1,30 @@
 import { useEffect, useState, useContext } from "react";
-import { Mail, Phone, MapPin, Calendar, Edit } from "lucide-react";
-import useAxios from "../../hooks/useAxios"; // adjust path if needed
-import {AuthContext} from "../../context/AuthContext"; // if you're using Firebase
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Edit,
+  Crown,
+  Star,
+  User,
+} from "lucide-react";
+import useAxios from "../../hooks/useAxiosSecure";
+import { AuthContext } from "../../context/AuthContext";
 
 const UserProfile = () => {
   const userAxios = useAxios();
-  // const { user: authUser } = useAuth();
-  const { user: authUser } = useContext(AuthContext); // logged-in user
+  const { user: authUser } = useContext(AuthContext);
+  // console.log(user)
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // console.log(user)
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await userAxios.get(`/users/${authUser.email}`);
+        const res = await userAxios.get(`/users_profile/${authUser.email}`);
         setUser(res.data);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -44,7 +54,24 @@ const UserProfile = () => {
     );
   }
 
-  // Mapping API data to your UI fields (without changing design)
+  // ====== USER STATUS LOGIC ======
+  const userStatus = user.user_status ? user.user_status.toLowerCase() : null;
+
+  const statusStyles = {
+    normal: "bg-gray-700 text-white",
+    explorer: "bg-gray-700 text-white",
+    artist: "bg-yellow-500 text-black",
+    curator: "bg-purple-600 text-white",
+  };
+
+  const statusLabel = {
+    normal: "Normal User",
+    explorer: "explorer",
+    artist: "artist",
+    curator: "curator",
+  };
+
+  // ====== PROFILE DATA ======
   const profileData = {
     name: user.name,
     email: user.email,
@@ -63,16 +90,30 @@ const UserProfile = () => {
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6">
       <div className="bg-white dark:bg-[#0d1d33] rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-        {/* COVER PHOTO */}
+        {/* ====== COVER PHOTO WITH STATUS ====== */}
         <div className="relative h-40 md:h-56">
           <img
             src={profileData.cover}
             alt="cover"
             className="w-full h-full object-cover"
           />
+
+          {/* USER STATUS BADGE (Only show if exists) */}
+          {userStatus && (
+            <div
+              className={`absolute top-4 right-4 flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg ${statusStyles[userStatus]}`}
+            >
+              {userStatus === "curator" && <Crown size={16} />}
+              {userStatus === "artist" && <Star size={16} />}
+              {(userStatus === "explorer" || userStatus === "free") && (
+                <User size={16} />
+              )}
+              {statusLabel[userStatus]}
+            </div>
+          )}
         </div>
 
-        {/* AVATAR + NAME SECTION */}
+        {/* ====== AVATAR + NAME SECTION ====== */}
         <div className="relative px-6 pb-6">
           <div className="flex flex-col md:flex-row items-center md:items-end gap-4 -mt-16">
             <img
@@ -97,7 +138,7 @@ const UserProfile = () => {
 
         <hr className="border-gray-200 dark:border-gray-700" />
 
-        {/* PROFILE DETAILS GRID */}
+        {/* ====== PROFILE DETAILS GRID ====== */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center gap-3">
             <Mail className="text-indigo-600" />
@@ -136,7 +177,7 @@ const UserProfile = () => {
           </div>
         </div>
 
-        {/* BIO SECTION */}
+        {/* ====== BIO SECTION ====== */}
         <div className="px-6 pb-6">
           <h3 className="text-lg font-semibold mb-2">About</h3>
           <p className="text-gray-600 dark:text-gray-300 leading-relaxed">

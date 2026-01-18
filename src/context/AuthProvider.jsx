@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { auth } from "../firebase/Firebase.init";
 import {
@@ -8,75 +7,147 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
   signInWithPopup,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
-import axios from "axios";
-// Adjust the import based on your firebase configuration
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
-  // google sign-in function
   const googleProvider = new GoogleAuthProvider();
 
-  // Google sign-in function
-  const googleSignIn = () => {
+  // 🔹 Google login
+  const googleSignIn = async () => {
     setLoading(true);
-    return signInWithPopup(auth, googleProvider);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      setUser(result.user);
+      return result;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Login function
-  const logIn = (email, password) => {
+  // 🔹 Email/password login
+  const logIn = async (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      setUser(res.user);
+      return res;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const logOut = () => {
+  // 🔹 Register
+  const createUser = async (email, password) => {
     setLoading(true);
-    return auth.signOut();
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      setUser(res.user);
+      return res;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Register function
-  const createUser = (email, password) => {
+  // 🔹 Update profile
+  const updateUser = async (updateData) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password);
+    try {
+      await updateProfile(auth.currentUser, updateData);
+      setUser({ ...auth.currentUser });
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // update user function
-  const updateUser = (updateData) => {
+  // 🔹 Logout
+  const logOut = async () => {
     setLoading(true);
-    return updateProfile(auth.currentUser, updateData);
+    try {
+      await auth.signOut();
+      setUser(null);
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Set up the user context
+  // 🔹 Delete account
+  const deleteAccount = async (password = null) => {
+    if (!auth.currentUser) throw new Error("No user logged in");
+
+    try {
+      if (
+        auth.currentUser.providerData[0].providerId === "password" &&
+        password
+      ) {
+        const credential = EmailAuthProvider.credential(
+          auth.currentUser.email,
+          password,
+        );
+        await reauthenticateWithCredential(auth.currentUser, credential);
+      } else if (auth.currentUser.providerData[0].providerId === "google.com") {
+        await signInWithPopup(auth, googleProvider);
+      }
+
+      await deleteUser(auth.currentUser);
+      setUser(null);
+      return true;
+    } catch (err) {
+      setError(err);
+      throw err;
+    }
+  };
+
+  // 🔹 Listen to auth state changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  const userInfo = {
-    logIn,
-    createUser,
-    logOut,
-    updateUser,
-    user,
-    loading,
-    error,
-    googleSignIn,
-    setUser,
-    setLoading,
-    setError,
-    auth,
-  };
-
   return (
-    <AuthContext.Provider value={userInfo}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        loading,
+        setLoading,
+        error,
+        setError,
+        googleSignIn,
+        logIn,
+        createUser,
+        updateUser,
+        logOut,
+        deleteAccount,
+        auth,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 

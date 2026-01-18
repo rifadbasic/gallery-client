@@ -7,7 +7,8 @@ import { AuthContext } from "../../context/AuthContext"; // logged-in user
 
 const MyImage = () => {
   const axiosInstance = useAxios();
-  const { user: authUser } = useContext(AuthContext); // logged-in user
+  const { user: authUser } = useContext(AuthContext); 
+  // console.log(authUser) // logged-in user
 
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);

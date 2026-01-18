@@ -1,27 +1,30 @@
-// src/hooks/useAxiosSecure.js
 import axios from "axios";
 import { useEffect } from "react";
 import useAuth from "./useAuth";
 import { useNavigate } from "react-router";
+import { getAuth } from "firebase/auth"; // 👈 ADD THIS
 
 const axiosSecure = axios.create({
   baseURL: import.meta.env.VITE_Base_URL,
 });
 
 const useAxiosSecure = () => {
-  const { user, logOut } = useAuth();
+  const { logOut } = useAuth();
   const navigate = useNavigate();
+  const auth = getAuth(); // 👈 Get Firebase auth instance
 
   useEffect(() => {
     const requestInterceptor = axiosSecure.interceptors.request.use(
       async (config) => {
-        if (user) {
-          const token = await user.getIdToken(); // ✅ Firebase ID token
+        const currentUser = auth.currentUser; // 🔹 REAL Firebase user
+
+        if (currentUser) {
+          const token = await currentUser.getIdToken(); // ✅ SAFE NOW
           config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     const responseInterceptor = axiosSecure.interceptors.response.use(
@@ -37,15 +40,14 @@ const useAxiosSecure = () => {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
 
-    // ✅ Eject on cleanup to prevent duplicate interceptors
     return () => {
       axiosSecure.interceptors.request.eject(requestInterceptor);
       axiosSecure.interceptors.response.eject(responseInterceptor);
     };
-  }, [user, logOut, navigate]);
+  }, [logOut, navigate]);
 
   return axiosSecure;
 };

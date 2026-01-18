@@ -3,13 +3,14 @@ import { Link, useNavigate, useLocation } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
-import useAxios from "../hooks/useAxios";
+import useAxios from "../hooks/useAxiosSecure";
 import { Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { googleSignIn, createUser, updateUser } = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
 
   const axios = useAxios();
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Register = () => {
 
   // Redirect path (default to homepage)
   const from = location.state?.from || "/";
-  console.log(from)
+  // console.log(from)
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -46,14 +47,13 @@ const Register = () => {
         `https://api.imgbb.com/1/upload?key=${
           import.meta.env.VITE_image_uplode_key
         }`,
-        fd
+        fd,
       );
 
       const photoURL = imgRes.data.data.url;
 
       // 2️⃣ Create user in Firebase
-      const result = await createUser(email, password);
-      const firebaseUser = result.user;
+      await createUser(email, password);
 
       // 3️⃣ Update Firebase profile
       await updateUser({
@@ -85,41 +85,38 @@ const Register = () => {
     }
   };
 
-  const handleGoogleRegister = async () => {
+  const handleGoogleSignIn = async () => {
     try {
       toast.loading("Signing in with Google...");
 
+      // 1️⃣ Sign in with Firebase Google
       const result = await googleSignIn();
-      const user = result.user;
+      const firebaseUser = result.user;
 
-      // Check if user exists in DB
-      const res = await axios.get(`/users/${user.email}`);
+      // 2️⃣ Send info to backend
+      const res = await axios.post("/auth/google", {
+        email: firebaseUser.email,
+        name: firebaseUser.displayName,
+        photo: firebaseUser.photoURL,
+      });
 
-      if (!res.data) {
-        // User not found → Register automatically
-        const googleUser = {
-          name: user.displayName,
-          email: user.email,
-          phone: "",
-          photo: user.photoURL,
-          password: "google_auth",
-          provider: "google",
-        };
+      if (res.data.success) {
+        setUser(res.data.user); // store in Auth context
 
-        await axios.post("/users", googleUser);
         toast.dismiss();
-        toast.success("Account created with Google ✨");
-      } else {
-        toast.dismiss();
-        toast.success("Logged in successfully 🚀");
+        if (res.data.existing) {
+          toast.info(res.data.message); // Existing user
+        } else {
+          toast.success(res.data.message); // New user
+        }
+
+        // 3️⃣ Redirect after login
+        navigate(from, { replace: true });
       }
-
-      // 🔹 Navigate to homepage or previous route
-      navigate(from, { replace: true });
     } catch (err) {
       toast.dismiss();
       toast.error("Google sign-in failed.");
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -195,7 +192,7 @@ const Register = () => {
 
         {/* Google */}
         <button
-          onClick={handleGoogleRegister}
+          onClick={handleGoogleSignIn}
           className="w-full mt-4 py-3 rounded-xl border flex items-center justify-center gap-2 transition"
         >
           <img

@@ -19,6 +19,7 @@ import ExplorePlan from "../pages/ExplorePlan";
 import About from "../pages/About";
 import Forbidden from "../pages/Error/Forbidden";
 import PrivetRoute from "../AuthRouters/PrivetRoute";
+import Payment from "../pages/Payment";
 
 const router = createBrowserRouter([
   {
@@ -48,7 +49,22 @@ const router = createBrowserRouter([
         path: "/favorites",
         element: <Favorites />,
       },
-      { path: "/subscription", element: <PrivetRoute><ExplorePlan /></PrivetRoute> },
+      {
+        path: "/subscription",
+        element: (
+          <PrivetRoute>
+            <ExplorePlan />
+          </PrivetRoute>
+        ),
+      },
+      {
+        path: "/payment/:id/:amount",
+        element: (
+          <PrivetRoute>
+            <Payment />
+          </PrivetRoute>
+        ),
+      },
       {
         path: "/login",
         element: <Login />,

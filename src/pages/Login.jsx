@@ -2,19 +2,16 @@ import { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
-import useAxios from "../hooks/useAxios";
+import useAxios from "../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { logIn, googleSignIn } = useContext(AuthContext);
+  const { logIn, googleSignIn, setUser } = useContext(AuthContext);
   const axios = useAxios();
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Redirect path (default to homepage)
   const from = location.state?.from || "/";
-  // console.log(from)
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,31 +20,26 @@ const Login = () => {
     const password = form.password.value;
 
     try {
-      toast.loading("Checking credentials...");
+      toast.loading("Logging in...");
 
-      // 1️⃣ Firebase login
+      // 1️⃣ Firebase auth
       await logIn(email, password);
 
-      // 2️⃣ Verify in Database
-      const res = await axios.post("/users/login", {
-        email,
-        password,
-      });
+      // 2️⃣ Check backend DB
+      const res = await axios.post("/users/login", { email });
 
+      toast.dismiss();
       if (res.data.success) {
-        toast.dismiss();
-        toast.success("Login successful 🚀");
-
-        // 🔹 Navigate to homepage or previous route
+        setUser(res.data.user);
+        toast.success(res.data.message);
         navigate(from, { replace: true });
       } else {
-        toast.dismiss();
         toast.error(res.data.message);
       }
     } catch (err) {
       toast.dismiss();
-      toast.error("Invalid credentials or server error ⚠️");
       console.log(err);
+      toast.error("Login failed. Check your credentials or server ⚠️");
     }
   };
 
@@ -56,25 +48,35 @@ const Login = () => {
       toast.loading("Signing in with Google...");
 
       const result = await googleSignIn();
-      const user = result.user;
+      const firebaseUser = result.user;
 
-      // Check if user exists in DB
-      const res = await axios.get(`/users/${user.email}`);
+      // Backend check
+      const res = await axios.post("/auth/google_login", {
+        email: firebaseUser.email,
+        name: firebaseUser.displayName,
+        photo: firebaseUser.photoURL,
+      });
 
-      if (!res.data) {
-        toast.dismiss();
-        toast.error("Google account not registered. Please register first.");
-      } else {
-        toast.dismiss();
-        toast.success("Login successful with Google 🚀");
+      toast.dismiss();
 
-        // 🔹 Navigate to homepage or previous route
+      if (res.data.success && res.data.existing) {
+        setUser(res.data.user);
+        toast.success(res.data.message);
         navigate(from, { replace: true });
+      } else if (!res.data.existing) {
+        toast.info(res.data.message);
+        navigate("/register", {
+          state: {
+            email: firebaseUser.email,
+            name: firebaseUser.displayName,
+            photo: firebaseUser.photoURL,
+          },
+        });
       }
     } catch (err) {
       toast.dismiss();
-      toast.error("Google login failed ⚠️");
       console.log(err);
+      toast.error("Google login failed ⚠️");
     }
   };
 
@@ -85,7 +87,6 @@ const Login = () => {
         <p className="text-center mt-2">Login to continue</p>
 
         <form onSubmit={handleLogin} className="mt-6 space-y-4">
-          {/* Email */}
           <div>
             <label className="text-sm">Email</label>
             <div className="relative mt-1">
@@ -100,7 +101,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Password */}
           <div>
             <label className="text-sm">Password</label>
             <div className="relative mt-1">
@@ -127,7 +127,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Google Login */}
         <button
           onClick={handleGoogleLogin}
           className="w-full mt-4 py-2 rounded-lg border flex items-center justify-center gap-2 transition"
