@@ -2,14 +2,14 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { toast, Bounce } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
-import { AuthContext } from "../../context/AuthContext"; 
+import { AuthContext } from "../../context/AuthContext";
 
 const initialState = {
   originalImage: "",
   name: "",
   description: "",
-  category: "Photography",
-  role: "Regular",
+  category: "",
+  role: "",
   status: "Pending",
   price: "",
   discountPercent: 0,
@@ -19,34 +19,23 @@ const initialState = {
 
 const AddImage = () => {
   const axiosInstance = useAxios();
-  const { user: authUser } = useContext(AuthContext); 
+  const { user: authUser } = useContext(AuthContext);
 
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState(initialState);
 
   // Upload image to imgbb
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const image = e.target.files[0];
     if (!image) return;
 
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("image", image);
+    setFormData((prev) => ({
+      ...prev,
+      imageFile: image, // 🔥 file রাখছি, URL না
+    }));
 
-    try {
-      const url = `https://api.imgbb.com/1/upload?key=${
-        import.meta.env.VITE_image_uplode_key
-      }`;
-
-      const res = await axios.post(url, fd);
-      setFormData((prev) => ({ ...prev, originalImage: res.data.data.url }));
-      toast.success("Image uploaded successfully 🌿");
-    } catch {
-      toast.error("Image upload failed. Please try again.");
-    } finally {
-      setUploading(false);
-    }
+    toast.success("Image selected 🌿");
   };
 
   // Price and discount logic
@@ -82,8 +71,8 @@ const AddImage = () => {
     e.preventDefault();
     if (submitting) return;
 
-    if (!formData.originalImage) {
-      toast.error("Please upload an image first!");
+    if (!formData.imageFile) {
+      toast.error("Please select an image first!");
       return;
     }
 
@@ -95,39 +84,34 @@ const AddImage = () => {
     setSubmitting(true);
 
     try {
-      const payload = {
-        img: formData.originalImage,
-        name: formData.name,
-        description: formData.description,
-        category: formData.category,
-        role: formData.role,
-        status: formData.status,
-        price: formData.price,
-        discountPercent: formData.discountPercent,
-        finalPrice: formData.finalPrice,
-        likes: formData.likes,
-        createdAt: new Date(),
-        userEmail: authUser.email,
-        userName: authUser.name || authUser.displayName,
-        userPhoto: authUser.photo || authUser.photoURL,
-      };
+      const fd = new FormData();
 
-      const res = await axiosInstance.post("/images", payload);
+      // 🔑 must match multer field name
+      fd.append("image", formData.imageFile);
 
-      if (res.status === 201 || res.data?.data) {
-        toast.success("Image added successfully 🌿", {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+      // other fields
+      fd.append("name", formData.name);
+      fd.append("description", formData.description);
+      fd.append("category", formData.category);
+      fd.append("role", formData.role);
+      fd.append("price", formData.price);
+      fd.append("discountPercent", formData.discountPercent);
+      fd.append("finalPrice", formData.finalPrice);
+      fd.append("likes", formData.likes || 0);
+      fd.append("createdAt", new Date().toISOString());
+      fd.append("userEmail", authUser.email);
+      fd.append("userName", authUser.name || authUser.displayName);
+      fd.append("userPhoto", authUser.photo || authUser.photoURL);
 
-        setFormData(initialState); 
+      const res = await axiosInstance.post("/images", fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (res.status === 201) {
+        toast.success("Image added successfully 🌿");
+        setFormData(initialState);
       }
     } catch (error) {
       console.error(error);

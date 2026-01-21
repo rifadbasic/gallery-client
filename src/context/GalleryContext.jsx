@@ -25,8 +25,8 @@ const GalleryProvider = ({ children }) => {
       "Cinematography",
       "Mixed media",
     ],
-    status: ["All", "Sold", "Unsold", "Global"],
-    role: ["All", "Regular", "Premium"],
+    status: ["All", "Sold", "Unsold",],
+    role: ["All", "Global", "Premium"],
   };
 
   // ===== FAVORITES =====

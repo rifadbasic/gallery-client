@@ -66,7 +66,7 @@ const UserProfilePage = () => {
       {/* ===== COVER PHOTO ===== */}
       <div className="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 rounded-3xl  shadow-md bg-gray-100">
         <img
-          src={user.coverPhoto || "https://source.unsplash.com/random/1200x400"}
+          src={user.coverPhoto || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"}
           alt="cover"
           className="w-full h-full object-cover rounded-3xl"
         />

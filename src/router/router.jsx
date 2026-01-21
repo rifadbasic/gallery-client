@@ -63,7 +63,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/category/:categoryName",
-        element: <CategoryImage />,
+
+        element: (
+          <PrivetRoute>
+            <CategoryImage />
+          </PrivetRoute>
+        ),
       },
       {
         path: "/favorites",

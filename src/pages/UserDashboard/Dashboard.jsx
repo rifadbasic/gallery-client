@@ -25,7 +25,7 @@ const Dashboard = () => {
   const [uploadedImagesCount, setUploadedImagesCount] = useState(0);
   const [favoriteImagesCount, setFavoriteImagesCount] = useState(0);
 
-  console.log(totalEarnings);
+  // console.log(totalEarnings);
 
   const PAYMENTS_LIMIT = 10;
 
@@ -73,9 +73,9 @@ const Dashboard = () => {
         setPayments(paymentsData);
 
         // 5. Calculate total earnings from uploaded images
-       const { data: total } = await axios.get(
-         `dashboard/earnings?userEmail=${currentUser.email}`,
-       )
+        const { data: total } = await axios.get(
+          `dashboard/earnings?userEmail=${currentUser.email}`,
+        );
         setTotalEarnings(total.total);
       } catch (err) {
         console.error("Dashboard fetch error:", err);
@@ -175,7 +175,8 @@ const Dashboard = () => {
           Payment & Sales Report
         </h2>
 
-        <div className="overflow-x-auto">
+        {/* ===== DESKTOP / TABLET TABLE ===== */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
@@ -199,7 +200,7 @@ const Dashboard = () => {
                     {pay._id}
                   </td>
                   <td className="py-3 text-gray-900 dark:text-white">
-                    {pay.amount}
+                    ৳ {pay.amount}
                   </td>
                   <td className="py-3 text-gray-600 dark:text-gray-300">
                     {pay.date}
@@ -207,32 +208,48 @@ const Dashboard = () => {
                   <td className="py-3 text-gray-600 dark:text-gray-300">
                     {pay.pay_for}
                   </td>
-                  {/* <td className="py-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        pay.status === "Completed"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-yellow-100 text-yellow-600"
-                      }`}
-                    >
-                      {pay.status}
-                    </span>
-                  </td> */}
                 </tr>
               ))}
             </tbody>
           </table>
-          {payments.length >= PAYMENTS_LIMIT && (
-            <div className="mt-3 text-center">
-              <button
-                onClick={loadMorePayments}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-              >
-                Show More
-              </button>
-            </div>
-          )}
         </div>
+
+        {/* ===== MOBILE CARD VIEW ===== */}
+        <div className="sm:hidden grid grid-cols-2 gap-3">
+          {payments.map((pay) => (
+            <div
+              key={pay._id}
+              className="bg-gray-50 dark:bg-[#132a4a] p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {pay._id}
+              </p>
+
+              <p className="mt-1 text-lg font-bold text-gray-900 dark:text-white">
+                ৳ {pay.amount}
+              </p>
+
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                {pay.pay_for}
+              </p>
+
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {pay.date}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {payments.length >= PAYMENTS_LIMIT && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={loadMorePayments}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+            >
+              Show More
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

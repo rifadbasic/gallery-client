@@ -356,7 +356,7 @@ const MyImage = () => {
                     type="number"
                     value={formData.finalPrice}
                     readOnly
-                    className="w-full border rounded px-2 py-1 bg-gray-100"
+                    className="w-full border rounded px-2 py-1 bg-gray-100 text-black"
                   />
                 </div>
               </div>
