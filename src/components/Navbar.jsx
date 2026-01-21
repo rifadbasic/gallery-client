@@ -6,12 +6,20 @@ import FavoriteNavButton from "../components/FavoriteNavButton";
 import ExplorePlanButton from "../components/ExplorePlanButton";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import useUserStatus from "../hooks/useUserStatus";
+import useUserRole from "../hooks/useUserRole";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { role, isLoading: roleLoading } = useUserRole();
+
+  const { userStatus } = useUserStatus();
+  const status = userStatus?.toLowerCase() || "explorer";
+
+  const isArtistOrAbove = status === "artist" || status === "creator";
 
   const mobileMenuRef = useRef(null);
   const desktopProfileRef = useRef(null);
@@ -149,21 +157,8 @@ const Navbar = () => {
           {/* Desktop icons */}
           <div className="hidden md:flex items-center gap-4 relative text-white">
             <ExplorePlanButton />
-            <FavoriteNavButton />
 
-            {/* Search */}
-            <div className="relative">
-              <Search
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="cursor-pointer hover:text-indigo-500"
-              />
-              {searchOpen && (
-                <input
-                  className="absolute right-0 top-10 w-60 rounded-lg px-3 py-2 border dark:border-gray-700 bg-white dark:bg-gray-800"
-                  placeholder="Search..."
-                />
-              )}
-            </div>
+            {isArtistOrAbove && <FavoriteNavButton />}
 
             {/* Profile */}
             <div className="relative" ref={desktopProfileRef}>
@@ -222,7 +217,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex gap-4 relative" ref={mobileProfileRef}>
-            <FavoriteNavButton />
+            {isArtistOrAbove && <FavoriteNavButton />}
             <User onClick={() => setProfileOpen(!profileOpen)} />
             {profileOpen && <ProfileDropdown align="left" />}
             <ThemeToggle />

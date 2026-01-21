@@ -12,7 +12,6 @@ const Header = () => {
 
   const [current, setCurrent] = useState(0);
 
-  // Auto-slide every 3 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));

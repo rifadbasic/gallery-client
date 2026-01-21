@@ -1,30 +1,33 @@
-// src/hooks/useUserStatus.js
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "./useAxiosSecure";
 import useAuth from "./useAuth";
 
 const useUserStatus = () => {
-  const { user, loading } = useAuth(); // your Firebase auth user
-  const axiosSecure = useAxiosSecure(); // axios instance with token interceptor
+  const { user, loading: authLoading } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
-  const {
-    data: userData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["user", user?.email],
-    enabled: !!user?.email && !loading,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user-status", user?.email],
+    enabled: !!user?.email && !authLoading,
     queryFn: async () => {
       const res = await axiosSecure.get(`/users/${user.email}`);
-      return res.data; // entire user object
+      return res.data;
     },
-    retry: false, // optional: avoid retrying on 403
+    staleTime: 0, 
+    cacheTime: Infinity,
+    retry: false,
   });
 
-  // Extract user_status or default to "free"
-  const userStatus = userData?.user_status || "free";
+  //  Update status in cache instantly
+  const updateStatus = (newStatus) => {
+    queryClient.setQueryData(["user-status", user?.email], (old) => ({
+      ...old,
+      user_status: newStatus,
+    }));
+  };
 
-  return { userStatus, isLoading, error };
+  return { userStatus: data?.user_status || "explorer", isLoading: isLoading || authLoading, error, updateStatus };
 };
 
 export default useUserStatus;

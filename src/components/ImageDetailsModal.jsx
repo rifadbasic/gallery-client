@@ -22,13 +22,11 @@ import "./component.css";
 const stripePromise = loadStripe(import.meta.env.VITE_Publishable_Key);
 
 const ImageDetailsModal = ({ img, onClose }) => {
-  // const navigate = useNavigate();
   const [showPayment, setShowPayment] = useState(false);
 
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
 
-  // CHECK IF USER HAS DOWNLOADED THIS IMAGE BEFORE
   const hasDownloaded = img.sold?.some((s) => s.buyerEmail === user?.email);
 
   const isWoner = img.userEmail === user?.email;
@@ -52,7 +50,7 @@ const ImageDetailsModal = ({ img, onClose }) => {
         const blob = await response.blob();
 
         // Your branded filename
-        const projectName = "gallery"; // <-- CHANGE THIS TO YOUR PROJECT NAME
+        const projectName = "gallery"; 
         const fileExtension = img.originalImage.split(".").pop();
         const fileName = `${projectName}_${img.name}.${fileExtension}`;
 

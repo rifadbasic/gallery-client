@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import useAxios from "../../hooks/useAxios";
+import useAxios from "../../hooks/useAxiosSecure";
 import ImageCard from "../../components/ImageCard";
 import { useGallery } from "../../context/GalleryContext";
-// import useAuth from "../../hooks/useAuth";
 
 const Gallery = () => {
   const { filters } = useGallery();
@@ -13,11 +12,12 @@ const Gallery = () => {
   const observerRef = useRef(null);
   const fetchingRef = useRef(false);
   const axios = useAxios();
-  // const { user } = useAuth();
 
-  // refetch when filters change
+  // console.log(images)
+
+  // Reset when filters change
   useEffect(() => {
-    setImages([]); // reset images
+    setImages([]);
     setPage(1);
     setHasMore(true);
   }, [filters]);
@@ -36,7 +36,10 @@ const Gallery = () => {
       if (role && role !== "All") query.append("role", role);
 
       const res = await axios.get(`/images?${query.toString()}`);
-      const newImages = Array.isArray(res.data?.images) ? res.data.images : [];
+      let newImages = Array.isArray(res.data?.images) ? res.data.images : [];
+
+      // ✅ Remove pending images
+      newImages = newImages.filter((img) => img.status !== "Pending");
 
       setImages((prev) => {
         const ids = new Set(prev.map((i) => i._id));
@@ -53,10 +56,12 @@ const Gallery = () => {
     }
   };
 
+  // Fetch when page changes
   useEffect(() => {
     fetchImages(page);
   }, [page, filters]);
 
+  // Infinite scroll observer
   const lastImageRef = useCallback(
     (node) => {
       if (loading) return;
@@ -87,16 +92,17 @@ const Gallery = () => {
           );
         })}
       </div>
+
       {loading && (
         <div className="text-center text-gray-500 mt-6">
           Loading more images...
         </div>
       )}
+
       {!loading && images.length === 0 && (
-        <div className="text-center text-gray-500 mt-6">
-          No images found.
-        </div>
+        <div className="text-center text-gray-500 mt-6">No images found.</div>
       )}
+
       {!hasMore && images.length > 0 && (
         <div className="text-center text-gray-400 mt-6">
           No more images to load.

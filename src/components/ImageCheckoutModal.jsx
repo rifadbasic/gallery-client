@@ -11,6 +11,8 @@ const ImageCheckoutModal = ({ img, onClose, onSuccess }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
+  console.log(img.finalPrice)
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) return;
@@ -46,7 +48,7 @@ const ImageCheckoutModal = ({ img, onClose, onSuccess }) => {
         await axiosSecure.post("/purchase-image", {
           imageId: img._id,
           imageName: img.name,
-          imageLink: img.img,
+          imageLink: img.originalImage,
           price: img.finalPrice,
           buyerEmail: user.email,
           buyerName: user.displayName,

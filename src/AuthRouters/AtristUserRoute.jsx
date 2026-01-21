@@ -14,7 +14,7 @@ const ArtistUserRoute = ({ children }) => {
   }
 
   if (!user || status !== "artist" && status !== "creator") {
-    return <Navigate to="/Subscriptions" state={{ from: location }} replace />;
+    return <Navigate to="/subscription" state={{ from: location }} replace />;
   }
 
   return children;

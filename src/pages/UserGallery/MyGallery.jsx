@@ -161,7 +161,7 @@ const MyGallery = () => {
           {favoriteImages.length > 10 && (
             <div className="mt-4 text-center">
               <button
-                onClick={() => navigate("/favorites")} // Create a favorites page
+                onClick={() => navigate("/favorites")}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md"
               >
                 See More Favorites
@@ -204,7 +204,7 @@ const MyGallery = () => {
           {purchasedImages.length > 10 && (
             <div className="mt-4 text-center">
               <button
-                onClick={() => navigate("/purchased")} // Create a purchased gallery page
+                onClick={() => navigate("/purchased")} 
                 className="px-4 py-2 bg-blue-600 text-white rounded-md"
               >
                 See More Purchased Images

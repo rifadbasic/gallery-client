@@ -8,21 +8,20 @@ import {
   X,
   Image,
   LogOut,
+  UserRoundPen,
 } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import useUserStatus from "../hooks/useUserStatus";
+import useUserRole from "../hooks/useUserRole";
 
 const UserLayout = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { logOut } = useContext(AuthContext);
-  const { userStatus:status } = useUserStatus();
+  const { userStatus: status } = useUserStatus();
+  const { role, isLoading: roleLoading } = useUserRole();
 
   // console.log(user);
-
-  
-
-
 
   const userStatus = status;
   // console.log(userStatus)
@@ -54,11 +53,19 @@ const UserLayout = () => {
     });
   }
 
-  // 🔹 Actual logout using AuthContext
+  if (role === "admin" && !roleLoading) {
+    links.splice(2, 0, {
+      name: "Admin Panel",
+      path: "/dashboard/admin-dashboard/admin-plan",
+      icon: <UserRoundPen size={20} />,
+    });
+  }
+
+  //  Actual logout using AuthContext
   const handleLogout = async () => {
     try {
-      await logOut(); // ✅ logs out the user
-      navigate("/"); // navigate home after logout
+      await logOut(); 
+      navigate("/"); 
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -98,7 +105,7 @@ const UserLayout = () => {
           </Link>
           {/* 🔹 LOG OUT BUTTON (desktop) */}
           <button
-            onClick={handleLogout} // now fully functional
+            onClick={handleLogout} 
             className="my-4 flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-red-500 hover:text-white  text-red-500"
           >
             <LogOut size={18} /> Log Out
@@ -107,9 +114,9 @@ const UserLayout = () => {
       </aside>
 
       {/* ===== MAIN CONTENT ===== */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col relative">
         {/* ===== MOBILE TOP NAV ===== */}
-        <div className="sticky top-0 md:hidden flex items-center justify-between px-4 py-3 bg-white dark:bg-[#0d1d33] shadow z-50">
+        <div className="sticky top-0 md:hidden flex items-center justify-between px-4 py-3 bg-[#0d1d33] shadow z-50">
           <Link to="/" className="flex items-center gap-1 text-sm">
             <Home size={18} /> Home
           </Link>
@@ -121,11 +128,11 @@ const UserLayout = () => {
           </button>
         </div>
 
-        {/* ===== MOBILE DROPDOWN ICON-ONLY MENU ===== */}
+        {/* ===== MOBILE DROPDOWN MENU ===== */}
         {open && (
           <div
             className="absolute top-13 left-1/2 transform -translate-x-1/2 w-[90%] md:hidden bg-[#0d1d33] p-3 rounded-xl shadow-lg flex justify-around items-center
-               transition-all duration-500 ease-out scale-95 opacity-100 animate-dropdown z-49"
+         transition-all duration-500 ease-out scale-95 opacity-100 animate-dropdown z-49"
           >
             {links.map((item) => (
               <NavLink
@@ -135,22 +142,21 @@ const UserLayout = () => {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `p-3 rounded-full flex justify-center items-center transition-colors duration-500
-                   ${
-                     isActive
-                       ? "bg-indigo-600 text-white"
-                       : "text-white hover:bg-indigo-500"
-                   }`
+             ${
+               isActive
+                 ? "bg-indigo-600 text-white"
+                 : "text-white hover:bg-indigo-500"
+             }`
                 }
               >
                 {item.icon}
               </NavLink>
             ))}
 
-            {/* 🔹 LOG OUT BUTTON (mobile) */}
             <button
               onClick={() => {
                 handleLogout();
-                setOpen(false); // close menu after logout
+                setOpen(false);
               }}
               className="p-3 rounded-full flex justify-center items-center text-red-500 hover:text-white hover:bg-red-500 transition"
               title="Log Out"
@@ -160,8 +166,12 @@ const UserLayout = () => {
           </div>
         )}
 
-        {/* ===== ROUTED PAGES WILL SCROLL ===== */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* ===== ROUTED PAGES ===== */}
+        <div
+          className="flex-1 overflow-y-auto p-6"
+          style={{ maxHeight: "calc(100vh - 56px)" }}
+        >
+          
           <Outlet />
         </div>
       </main>

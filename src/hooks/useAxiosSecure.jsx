@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import useAuth from "./useAuth";
 import { useNavigate } from "react-router";
-import { getAuth } from "firebase/auth"; // 👈 ADD THIS
+import { getAuth } from "firebase/auth"; 
 
 const axiosSecure = axios.create({
   baseURL: import.meta.env.VITE_Base_URL,
@@ -11,15 +11,15 @@ const axiosSecure = axios.create({
 const useAxiosSecure = () => {
   const { logOut } = useAuth();
   const navigate = useNavigate();
-  const auth = getAuth(); // 👈 Get Firebase auth instance
+  const auth = getAuth();
 
   useEffect(() => {
     const requestInterceptor = axiosSecure.interceptors.request.use(
       async (config) => {
-        const currentUser = auth.currentUser; // 🔹 REAL Firebase user
+        const currentUser = auth.currentUser; 
 
         if (currentUser) {
-          const token = await currentUser.getIdToken(); // ✅ SAFE NOW
+          const token = await currentUser.getIdToken(); 
           config.headers.Authorization = `Bearer ${token}`;
         }
         return config;

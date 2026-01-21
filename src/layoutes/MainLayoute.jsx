@@ -6,7 +6,7 @@ import { ToastContainer, Bounce } from "react-toastify";
 import { useEffect } from "react";
 import { useGallery } from "../context/GalleryContext";
 import useAuth from "../hooks/useAuth";
-import useAxios from "../hooks/useAxios";
+import useAxios from "../hooks/useAxiosSecure";
 
 
 export default function MainLayoute() {
@@ -19,7 +19,7 @@ export default function MainLayoute() {
 
     const loadFavorites = async () => {
       try {
-        const res = await axios.get(`/users/${encodeURIComponent(user.email)}/favorites`);        setInitialFavorites(res.data); // 🔥 খুব গুরুত্বপূর্ণ লাইন
+        const res = await axios.get(`/users/${(user.email)}/favorites`);        setInitialFavorites(res.data); // 🔥 খুব গুরুত্বপূর্ণ লাইন
       } catch (err) {
         console.error("Load favorites failed:", err);
       }

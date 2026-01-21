@@ -52,16 +52,16 @@ const Register = () => {
 
       const photoURL = imgRes.data.data.url;
 
-      // 2️⃣ Create user in Firebase
+      // 2️ Create user in Firebase
       await createUser(email, password);
 
-      // 3️⃣ Update Firebase profile
+      // 3️ Update Firebase profile
       await updateUser({
         displayName: name,
         photoURL: photoURL,
       });
 
-      // 4️⃣ Save user in your database
+      // 4️ Save user in your database
       const userData = {
         name,
         email,
@@ -76,7 +76,7 @@ const Register = () => {
       toast.dismiss();
       toast.success("Account created successfully 🚀");
 
-      // 🔹 Navigate to homepage or previous route
+      //  Navigate to homepage or previous route
       navigate(from, { replace: true });
     } catch (err) {
       toast.dismiss();
@@ -101,13 +101,13 @@ const Register = () => {
       });
 
       if (res.data.success) {
-        setUser(res.data.user); // store in Auth context
+        setUser(res.data.user); 
 
         toast.dismiss();
         if (res.data.existing) {
-          toast.info(res.data.message); // Existing user
+          toast.info(res.data.message);
         } else {
-          toast.success(res.data.message); // New user
+          toast.success(res.data.message); 
         }
 
         // 3️⃣ Redirect after login

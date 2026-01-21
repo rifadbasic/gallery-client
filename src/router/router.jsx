@@ -21,6 +21,17 @@ import Forbidden from "../pages/Error/Forbidden";
 import PrivetRoute from "../AuthRouters/PrivetRoute";
 import Payment from "../pages/Payment";
 import ArtistUserRoute from "../AuthRouters/AtristUserRoute";
+import AdminLayoute from "../layoutes/AdminLayoute";
+import AdminPlan from "../pages/admin/AdminPlan";
+import AdminRoute from "../AuthRouters/AdminRoute";
+import TotalUsers from "../pages/admin/TotalUsers";
+import Subscriptions from "../pages/admin/Subscriptions";
+import Payments from "../pages/admin/Payments";
+import ImagePayments from "../pages/admin/ImagePayment";
+import SubscriptionPayments from "../pages/admin/SubscriptionPayments";
+import CategoryImage from "../pages/CategoryImage";
+import TotalImage from "../pages/admin/TotalImage";
+import UserProfilePage from "../pages/UserProfilePage";
 
 const router = createBrowserRouter([
   {
@@ -38,7 +49,11 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/gallery",
-            element: <Gallery />,
+            element: (
+              <PrivetRoute>
+                <Gallery />
+              </PrivetRoute>
+            ),
           },
         ],
       },
@@ -47,8 +62,16 @@ const router = createBrowserRouter([
         element: <About />,
       },
       {
+        path: "/category/:categoryName",
+        element: <CategoryImage />,
+      },
+      {
         path: "/favorites",
-        element: <Favorites />,
+        element: (
+          <ArtistUserRoute>
+            <Favorites />
+          </ArtistUserRoute>
+        ),
       },
       {
         path: "/subscription",
@@ -65,7 +88,16 @@ const router = createBrowserRouter([
             <Payment />
           </PrivetRoute>
         ),
-      },      {
+      },
+      {
+        path: "/profile/:email",
+        element: (
+          <PrivetRoute>
+            <UserProfilePage />
+          </PrivetRoute>
+        ),
+      },
+      {
         path: "/login",
         element: <Login />,
       },
@@ -120,7 +152,7 @@ const router = createBrowserRouter([
             element: (
               <PrivetRoute>
                 <ArtistUserRoute>
-                <MyImage />
+                  <MyImage />
                 </ArtistUserRoute>
               </PrivetRoute>
             ),
@@ -129,9 +161,91 @@ const router = createBrowserRouter([
             path: "add-image",
             element: (
               <PrivetRoute>
-                <ArtistUserRoute> 
-                <AddImage />
+                <ArtistUserRoute>
+                  <AddImage />
                 </ArtistUserRoute>
+              </PrivetRoute>
+            ),
+          },
+        ],
+      },
+      {
+        path: "admin-dashboard",
+        element: (
+          <PrivetRoute>
+            <AdminRoute>
+              <AdminLayoute />
+            </AdminRoute>
+          </PrivetRoute>
+        ),
+        children: [
+          {
+            path: "admin-plan",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <AdminPlan />
+                </AdminRoute>
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "images",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <TotalImage />
+                </AdminRoute>
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "users",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <TotalUsers />
+                </AdminRoute>
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "subscriptions",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <Subscriptions />
+                </AdminRoute>
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "payments",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <Payments />
+                </AdminRoute>
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "image-payments",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <ImagePayments />
+                </AdminRoute>
+              </PrivetRoute>
+            ),
+          },
+          {
+            path: "subscriptions-all",
+            element: (
+              <PrivetRoute>
+                <AdminRoute>
+                  <SubscriptionPayments />
+                </AdminRoute>
               </PrivetRoute>
             ),
           },

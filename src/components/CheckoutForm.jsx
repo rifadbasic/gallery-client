@@ -2,10 +2,11 @@ import { useState } from "react";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import useAuth from "../hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useLocation } from "react-router";
 import Swal from "sweetalert2";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { FaCamera, FaPalette, FaGem } from "react-icons/fa";
+import useUserStatus from "../hooks/useUserStatus";
 
 const plans = [
   {
@@ -18,7 +19,6 @@ const plans = [
       "Basic filters & search",
       "Community support chat",
     ],
-    accent: "from-blue-400 to-blue-600",
     duration: "Unlimited",
   },
   {
@@ -27,12 +27,11 @@ const plans = [
     price: 999,
     display: "$9.99 / month",
     features: [
-      "Add your own images to gallery",
+      "Add your own images",
       "Advanced filters & search",
-      "Save favorite collections",
-      "Monthly featured artist content",
+      "Save favorites",
+      "Monthly featured content",
     ],
-    accent: "from-yellow-400 to-yellow-600",
     duration: "1 Month",
   },
   {
@@ -42,11 +41,10 @@ const plans = [
     display: "$19.99 / month",
     features: [
       "All Artist features",
-      "Premium image access",
-      "Exclusive gallery previews",
+      "Premium access",
+      "Exclusive previews",
       "1-on-1 creator support",
     ],
-    accent: "from-purple-500 to-indigo-600",
     duration: "1 Month",
   },
 ];
@@ -59,10 +57,12 @@ const CheckoutForm = () => {
   const { id, amount: amountParam } = useParams();
   const amount = Number(amountParam);
   const navigate = useNavigate();
+  const location = useLocation(); 
+  const { updateStatus } = useUserStatus(); 
 
   const [loading, setLoading] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState("");
 
+  // fetch user subscription
   const { data: userData = {} } = useQuery({
     enabled: !!user?.email,
     queryKey: ["user-payment", user?.email],
@@ -77,26 +77,33 @@ const CheckoutForm = () => {
       const res = await axiosSecure.patch("/users/premium", paymentInfo);
       return res.data;
     },
-    onSuccess: (data) => {
-      if (data.modifiedCount > 0) {
-        setPaymentSuccess("✅ Payment Successful!");
-        Swal.fire("Success", "Your subscription has been updated!", "success");
-        navigate("/");
-      } else {
-        Swal.fire("Oops", "Subscription update failed.", "warning");
-      }
-    },
-    onError: (err) => {
-      Swal.fire("Error", err.message, "error");
-    },
   });
 
   const handleFreeSubscription = async () => {
-    mutation.mutate({
-      email: userData.email,
-      amount: 0,
-      transactionId: "free_plan_no_payment",
-    });
+    try {
+      setLoading(true);
+      await mutation.mutateAsync({
+        email: userData.email,
+        amount: 0,
+        transactionId: "free_plan_no_payment",
+      });
+
+      updateStatus("explorer"); 
+     
+      await Swal.fire({
+        icon: "success",
+        title: "Subscription Activated!",
+        text: "You are now on Free Plan",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+      });
+
+      navigate(location.state?.from || "/");
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -105,6 +112,7 @@ const CheckoutForm = () => {
     setLoading(true);
 
     try {
+      // create payment intent
       const { data } = await axiosSecure.post("/create-payment-intent", {
         amount,
         email: userData.email,
@@ -113,13 +121,11 @@ const CheckoutForm = () => {
 
       const clientSecret = data.clientSecret;
 
+      // confirm payment
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
-          billing_details: {
-            name: userData.name,
-            email: userData.email,
-          },
+          billing_details: { name: userData.name, email: userData.email },
         },
       });
 
@@ -128,6 +134,7 @@ const CheckoutForm = () => {
       if (result.paymentIntent.status === "succeeded") {
         const transactionId = result.paymentIntent.id;
 
+        // save payment history
         await axiosSecure.post("/payments", {
           pay_for: "subscription",
           email: userData.email,
@@ -137,11 +144,28 @@ const CheckoutForm = () => {
           date: new Date(),
         });
 
+        // update backend status
         await mutation.mutateAsync({
           email: userData.email,
           amount,
           transactionId,
         });
+
+        // frontend instant update
+        let newStatus =
+          amount === 999 ? "artist" : amount === 1999 ? "creator" : "explorer";
+        updateStatus(newStatus);
+
+        // ✅ toast + redirect
+        await Swal.fire({
+          icon: "success",
+          title: "Payment Successful!",
+          text: `You are now on ${newStatus} plan.`,
+          confirmButtonText: "OK",
+          allowOutsideClick: false,
+        });
+
+        navigate(location.state?.from || "/");
       }
     } catch (err) {
       Swal.fire("Payment Error", err.message, "error");
@@ -150,14 +174,13 @@ const CheckoutForm = () => {
     }
   };
 
-  // find selected plan based on amount
   const selectedPlan = plans.find((p) => p.price === amount) || plans[0];
 
   return (
-    <div className="min-h-[80vh] flex justify-center items-center p-4 ">
+    <div className="min-h-[80vh] flex justify-center items-center p-4">
       <div className="w-full max-w-2xl bg-white shadow-2xl rounded-3xl p-4 md:p-10 border border-indigo-200 mt-18">
         <h2 className="text-xl md:text-2xl font-bold text-center text-indigo-700 mb-6">
-          {amount === 0 ? "Activate Free Plan" : "your subscription Payment"}
+          {amount === 0 ? "Activate Free Plan" : "Your Subscription Payment"}
         </h2>
 
         {/* User & Plan Info */}
@@ -221,25 +244,14 @@ const CheckoutForm = () => {
                 }}
               />
             </div>
-
             <button
               type="submit"
               disabled={!stripe || loading}
-              className={`w-full py-3 rounded-xl font-medium text-white text-lg transition duration-300 ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              }`}
+              className={`w-full py-3 rounded-xl font-medium text-white text-lg transition duration-300 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"}`}
             >
               {loading ? "Processing..." : `Pay ৳${amount}`}
             </button>
           </form>
-        )}
-
-        {paymentSuccess && (
-          <p className="text-green-600 text-center mt-4 text-lg">
-            {paymentSuccess}
-          </p>
         )}
       </div>
     </div>

@@ -11,9 +11,11 @@ import {
 } from "lucide-react";
 import useAxios from "../../hooks/useAxiosSecure";
 import { AuthContext } from "../../context/AuthContext";
+import EditProfileModal from "../../components/EditProfileModal";
 
 const UserProfile = () => {
   const userAxios = useAxios();
+  const [editOpen, setEditOpen] = useState(false);
   const { user: authUser } = useContext(AuthContext);
   // console.log(user)
 
@@ -83,9 +85,9 @@ const UserProfile = () => {
       month: "long",
       year: "numeric",
     }),
-    bio: "A passionate learner in Computer Science Technology, building dreams in code and believing in discipline, faith, and progress.",
+    bio: user.bio || "A passionate learner in Computer Science Technology, building dreams in code and believing in discipline, faith, and progress.",
     avatar: user.photo,
-    cover: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    cover: user.coverPhoto || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
   };
 
   return (
@@ -130,10 +132,20 @@ const UserProfile = () => {
               </p>
             </div>
 
-            <button className="ml-auto mt-4 md:mt-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+            <button
+              onClick={() => setEditOpen(true)}
+              className="ml-auto flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg"
+            >
               <Edit size={18} />
               Edit Profile
             </button>
+
+            <EditProfileModal
+              isOpen={editOpen}
+              onClose={() => setEditOpen(false)}
+              user={user}
+              onUpdated={(updated) => setUser(updated)}
+            />
           </div>
         </div>
 

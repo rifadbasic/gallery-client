@@ -75,7 +75,7 @@ const ExplorePlan = () => {
     },
   });
 
-  const userStatus = (userData.user_status || "explorer").toLowerCase();
+  const userStatus = (userData.user_status || "free").toLowerCase();
 
   const handleSubscribe = (amount, id) => {
     if (loading || isLoading) return;

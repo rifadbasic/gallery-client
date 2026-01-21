@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { toast, Bounce } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
-import { AuthContext } from "../../context/AuthContext"; // Firebase or your auth context
+import { AuthContext } from "../../context/AuthContext"; 
 
 const initialState = {
   originalImage: "",
@@ -19,7 +19,7 @@ const initialState = {
 
 const AddImage = () => {
   const axiosInstance = useAxios();
-  const { user: authUser } = useContext(AuthContext); // logged-in user
+  const { user: authUser } = useContext(AuthContext); 
 
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -127,7 +127,7 @@ const AddImage = () => {
           transition: Bounce,
         });
 
-        setFormData(initialState); // reset form
+        setFormData(initialState); 
       }
     } catch (error) {
       console.error(error);

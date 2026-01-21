@@ -69,7 +69,7 @@ const GalleryProvider = ({ children }) => {
         filters,
         updateFilters,
         resetFilters,
-        filterOptions, // 🔥 export options for dropdowns
+        filterOptions, 
       }}
     >
       {children}

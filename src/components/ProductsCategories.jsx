@@ -9,7 +9,7 @@ const categories = [
     icon: <Camera className="w-8 h-8" />,
     description: "Captured moments, frozen in time.",
     color: "bg-indigo-100 text-indigo-600",
-    link: "/category/photography",
+    link: "/category/photography"
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const categories = [
     icon: <Palette className="w-8 h-8" />,
     description: "Modern creativity in pixels.",
     color: "bg-pink-100 text-pink-600",
-    link: "/category/digital-art",
+    link: "/category/digital-art"
   },
   {
     id: 3,
@@ -25,7 +25,7 @@ const categories = [
     icon: <Image className="w-8 h-8" />,
     description: "Hand-drawn artistic expression.",
     color: "bg-green-100 text-green-600",
-    link: "/category/illustration",
+    link: "/category/illustration"
   },
   {
     id: 4,
@@ -33,7 +33,7 @@ const categories = [
     icon: <Film className="w-8 h-8" />,
     description: "Motion, emotion, and storytelling.",
     color: "bg-blue-100 text-blue-600",
-    link: "/category/cinematography",
+    link: "/category/cinematography"
   },
   {
     id: 5,
@@ -41,7 +41,7 @@ const categories = [
     icon: <Layers className="w-8 h-8" />,
     description: "Where different arts collide.",
     color: "bg-yellow-100 text-yellow-600",
-    link: "/category/mixed-media",
+    link: "/category/mixed-media"
   },
 ];
 
@@ -53,7 +53,7 @@ const ProductsCategories = () => {
         <h2 className="text-3xl md:text-4xl font-bold title-text ">
           Explore Categories
         </h2>
-        <p className="text-gray-600 dark:text-gray-300 mt-3 max-w-xl mx-auto">
+        <p className="text-gray-400 mt-3 max-w-xl mx-auto">
           Walk through different creative spaces of our Gallery and discover
           your favorite art form.
         </p>

@@ -13,8 +13,8 @@ const UserRoute = ({ children }) => {
     return <span className="loading loading-spinner loading-lg"></span>;
   }
 
-  if (!user || status === "active") {
-    return <Navigate to="/subscriptions" state={{ from: location }} replace />;
+  if (!user || status === "explorer") {
+    return <Navigate to="/subscription" state={{ from: location }} replace />;
   }
 
   return children;

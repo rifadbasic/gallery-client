@@ -26,6 +26,9 @@ const Account = () => {
   const [accountData, setAccountData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [totalSales, setTotalSales] = useState(0);
+  const [totalIncome, setTotalIncome] = useState(0);
+  // console.log(totalIncome)
 
   // FETCH USER DATA
   useEffect(() => {
@@ -41,15 +44,36 @@ const Account = () => {
         console.error(err);
         setLoading(false);
       });
+
+    // sold sount
+    axios
+      .get(`/account/sold?email=${user.email}`)
+      .then((res) => {
+        // console.log(res.data);
+        setTotalSales(res.data.count);
+      })
+      .catch((err) => console.error(err));
+    // income
+    axios
+      .get(`/account/income?email=${user.email}`)
+      .then((res) => {
+        setTotalIncome(res.data.total);
+      })
+      .catch((err) => console.error(err));
   }, [user]);
 
   const cards = [
-    { title: "Total Income", value: "৳ 45,000", icon: DollarSign },
-    { title: "Total Sales", value: 126, icon: BarChart },
-    { title: "Current Balance", value: "৳ 12,500", icon: Wallet },
+    { title: "Total Income", value: "৳" + " " + totalIncome, icon: DollarSign },
+    {
+      title: "Total Sales",
+      value: totalSales,
+      icon: BarChart,
+    },
+
+    { title: "Current Balance", value: "৳" + " " + totalIncome, icon: Wallet },
     {
       title: "Pending Withdrawal",
-      value: "৳ 3,200",
+      value: "৳" + " " + totalIncome,
       icon: Clock,
     },
   ];
@@ -116,8 +140,13 @@ const Account = () => {
             />
             <InfoRow
               label="Member Since"
-              value={accountData?.createdAt ? new Date(accountData.createdAt).toLocaleDateString() : "Unknown"}
-            />          </Section>
+              value={
+                accountData?.createdAt
+                  ? new Date(accountData.createdAt).toLocaleDateString()
+                  : "Unknown"
+              }
+            />{" "}
+          </Section>
 
           <Section title="Security" icon={<Shield size={18} />}>
             <ActionRow
@@ -142,7 +171,7 @@ const Account = () => {
               <Settings size={18} /> Account Status
             </h3>
 
-            <div className="space-y-3">
+            <div className=" flex gap-2">
               <StatusBadge label={accountData?.role || "User"} color="green" />
               <StatusBadge
                 label={accountData?.user_status || "Active"}
