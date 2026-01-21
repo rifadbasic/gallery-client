@@ -4,6 +4,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function ImagePayments() {
+  // dynamic tytle
+  document.title = "Image Payments | Admin";
+
   const axiosSecure = useAxiosSecure();
 
   const [payments, setPayments] = useState([]);
@@ -83,10 +86,10 @@ export default function ImagePayments() {
   const deselectAll = () => setSelected([]);
 
   return (
-    <div className="p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="p-4 md:p-6 min-h-screen ">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+      <h1 className="text-2xl md:text-3xl font-bold mb-4 ">
         Image Payments
       </h1>
 

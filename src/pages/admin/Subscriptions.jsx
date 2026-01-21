@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function Subscriptions() {
+  // dynamic tytle
+  document.title = "Subscriptions | Admin";
+
   const axiosSecure = useAxiosSecure();
 
   const [subs, setSubs] = useState([]);
@@ -73,14 +76,14 @@ export default function Subscriptions() {
   };
 
   return (
-    <div className="p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="p-4 md:p-6 min-h-screen ">
       <h1 className="text-xl md:text-2xl font-bold mb-4">All Subscriptions</h1>
 
       {/* SEARCH BAR */}
       <input
         type="text"
         placeholder="Search by user email..."
-        className="md:w-full p-3 border rounded-lg mb-4 dark:bg-[#0d1d33] dark:text-white"
+        className="md:w-full p-3 border rounded-lg mb-4 "
         value={search}
         onChange={(e) => {
           setPage(1);
@@ -97,7 +100,7 @@ export default function Subscriptions() {
           {/* DESKTOP TABLE */}
           <div className="hidden md:block shadow rounded-lg border overflow-x-auto">
             <table className="min-w-full border-collapse table-auto">
-              <thead className="bg-gray-200 dark:bg-gray-700">
+              <thead className="bg-gray-700">
                 <tr>
                   <th className="p-3 text-left">Name</th>
                   <th className="p-3 text-left">Email</th>
@@ -147,7 +150,7 @@ export default function Subscriptions() {
             {subs.map((s) => (
               <div
                 key={s._id}
-                className="bg-white dark:bg-[#0d1d33] shadow rounded-lg p-4 flex flex-col gap-2 border dark:border-gray-700"
+                className=" shadow rounded-lg p-4 flex flex-col gap-2 border dark:border-gray-700"
               >
                 <div className="flex justify-between items-center">
                   <p className="font-semibold">{s.name}</p>
@@ -158,7 +161,7 @@ export default function Subscriptions() {
                         : "bg-green-100 text-green-700"
                     }`}
                   >
-                    {s.status}
+                    {s.status || "ACTIVE"}
                   </span>
                 </div>
                 <p>

@@ -1,5 +1,4 @@
-import { useState, useContext } from "react";
-import axios from "axios";
+import { useState, useContext, useEffect } from "react";
 import { toast, Bounce } from "react-toastify";
 import useAxios from "../../hooks/useAxios";
 import { AuthContext } from "../../context/AuthContext";
@@ -8,8 +7,8 @@ const initialState = {
   originalImage: "",
   name: "",
   description: "",
-  category: "",
-  role: "",
+  category: "Photography",
+  role: "Global",
   status: "Pending",
   price: "",
   discountPercent: 0,
@@ -18,8 +17,15 @@ const initialState = {
 };
 
 const AddImage = () => {
+
+
   const axiosInstance = useAxios();
   const { user: authUser } = useContext(AuthContext);
+
+  // dynamic title
+  useEffect(() => {
+      document.title =  "Add Image" + " | " + authUser?.displayName || "Add Images | User Gallery";
+    }, [authUser]);
 
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -129,7 +135,7 @@ const AddImage = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow-lg"
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 border-1 p-5 rounded-xl shadow-lg"
       >
         {/* Image Upload */}
         <div className="md:col-span-2">
@@ -137,18 +143,18 @@ const AddImage = () => {
             <img
               src={formData.originalImage}
               alt="preview"
-              className="mt-3 h-40 w-40 object-cover rounded-lg bg-[#0d1d33] text-white"
+              className="mt-3 h-40 w-40 object-cover rounded-lg "
             />
           )}
 
-          <label className="block mb-2 text-gray-700 dark:text-gray-300">
+          <label className="block mb-2 ">
             Upload Image <span className="text-red-500">*</span>
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={handleImageUpload}
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg "
           />
           {uploading && (
             <p className="text-sm mt-2 text-indigo-500">Uploading...</p>
@@ -163,7 +169,7 @@ const AddImage = () => {
           <input
             type="text"
             placeholder="Sunset in Cox's Bazar"
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg "
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -176,7 +182,7 @@ const AddImage = () => {
             Category <span className="text-red-500">*</span>
           </label>
           <select
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg "
             value={formData.category}
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
@@ -196,7 +202,7 @@ const AddImage = () => {
             Image Role <span className="text-red-500">*</span>
           </label>
           <select
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg"
             value={formData.role}
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
           >
@@ -213,7 +219,7 @@ const AddImage = () => {
           <input
             type="number"
             min="0"
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg"
             value={formData.price}
             onChange={handlePriceChange}
             required
@@ -227,7 +233,7 @@ const AddImage = () => {
             type="number"
             min="0"
             max="100"
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg "
             value={formData.discountPercent}
             onChange={handleDiscountChange}
           />
@@ -238,7 +244,7 @@ const AddImage = () => {
           <label className="block mb-2">Final Price (৳)</label>
           <input
             type="text"
-            className="w-full border p-2 rounded-lg bg-[#0d1d33] text-white"
+            className="w-full border p-2 rounded-lg "
             value={formData.finalPrice}
             readOnly
           />

@@ -60,7 +60,8 @@ const ExplorePlan = () => {
   const email = user?.email;
   // console.log(email)
 
-  document.title = "Gallery Plans | Explore";
+  // dynamic title
+  document.title = "Explore Plan | Gallery";
 
   const {
     data: userData = {},
@@ -162,9 +163,7 @@ const ExplorePlan = () => {
               <div className="p-8 text-center flex flex-col items-center gap-4">
                 {plan.icon}
 
-                <h3 className="text-2xl font-bold ">
-                  {plan.name}
-                </h3>
+                <h3 className="text-2xl font-bold ">{plan.name}</h3>
 
                 <p className="text-indigo-600 font-semibold">{plan.display}</p>
 

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useContext } from "react";
 import { toast } from "react-toastify";
 import useAxios from "../../hooks/useAxiosSecure";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, Download, CheckSquare, Square } from "lucide-react";
 import Swal from "sweetalert2";
 import { AuthContext } from "../../context/AuthContext";
 import Modal from "react-modal";
@@ -12,18 +12,32 @@ const MyImage = () => {
   const axiosInstance = useAxios();
   const { user: authUser } = useContext(AuthContext);
 
+  // dynamic title
+  useEffect(() => {
+    document.title =
+      "My Image" + " | " + authUser?.displayName || "My Images | User Gallery";
+  }, [authUser]);
+
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef(null);
-  console.log(images);
+  // console.log(images);
 
   const [selectedImage, setSelectedImage] = useState(null); // view modal
   const [editImage, setEditImage] = useState(null); // edit modal
   const [formData, setFormData] = useState({});
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
+
+  // select troggol
+  const toggleSelect = (id) => {
+    setSelectedImages((prev) =>
+      prev.includes(id) ? prev.filter((imgId) => imgId !== id) : [...prev, id],
+    );
+  };
 
   // Fetch images
   const fetchImages = async () => {
@@ -73,6 +87,16 @@ const MyImage = () => {
     return () => observer.disconnect();
   }, [hasMore]);
 
+  // handel downlode
+  const handleDownload = (url, name = "image") => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Delete
   const handleDelete = async (id) => {
     const result = await Swal.fire({
@@ -93,6 +117,32 @@ const MyImage = () => {
       } catch (error) {
         toast.error("Delete failed");
       }
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    const result = await Swal.fire({
+      title: "Delete selected images?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete all",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await axiosInstance.post("/images/bulk-delete", {
+        imageIds: selectedImages,
+      });
+
+      setImages((prev) =>
+        prev.filter((img) => !selectedImages.includes(img._id)),
+      );
+      setSelectedImages([]);
+      toast.success("Selected images deleted 🌿");
+    } catch (err) {
+      toast.error("Bulk delete failed");
     }
   };
 
@@ -183,12 +233,48 @@ const MyImage = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6">
+      {selectedImages.length > 0 && (
+        <button
+          onClick={handleBulkDelete}
+          className="fixed bottom-15 right-6 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-20"
+        >
+          Delete Selected ({selectedImages.length})
+        </button>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {images.map((img) => (
           <div
             key={img._id}
-            className="relative group rounded-xl overflow-hidden shadow-lg"
+            className={`relative group rounded-xl overflow-hidden shadow-lg 
+                      ${selectedImages.includes(img._id) ? "ring-4 ring-green-400" : ""}`}
           >
+            {/* Checkbox */}
+            <div className="absolute top-2 left-2 z-10">
+              {selectedImages.includes(img._id) ? (
+                <CheckSquare
+                  size={20}
+                  className="text-green-400 cursor-pointer"
+                  onClick={() => toggleSelect(img._id)}
+                />
+              ) : (
+                <Square
+                  size={20}
+                  className="text-white cursor-pointer"
+                  onClick={() => toggleSelect(img._id)}
+                />
+              )}
+            </div>
+
+            {/* Download button */}
+            <div className="absolute top-2 right-2 z-10">
+              <Download
+                size={25}
+                className="text-white bg-black/50 p-1 rounded cursor-pointer hover:bg-black"
+                onClick={() => handleDownload(img.originalImage, img.name)}
+              />
+            </div>
+
             <img
               src={img.originalImage}
               alt={img.name}
@@ -227,7 +313,7 @@ const MyImage = () => {
         isOpen={!!selectedImage}
         onRequestClose={() => setSelectedImage(null)}
         contentLabel="Image Details"
-        className="max-w-3xl mx-auto my-20 bg-white dark:bg-[#0b1424] rounded-xl p-6 outline-none shadow-lg relative"
+        className="max-w-3xl mx-auto my-20 bg-[#12305ae8] rounded-xl p-6 outline-none shadow-lg relative"
         overlayClassName="fixed inset-0 bg-black/50 flex items-start justify-center z-50"
       >
         {selectedImage && (
@@ -251,6 +337,9 @@ const MyImage = () => {
               <span className="text-sm bg-indigo-100 dark:bg-indigo-900 px-2 py-1 rounded">
                 Role: {selectedImage.role}
               </span>
+              <span className="text-sm bg-blue-900 px-2 py-1 rounded">
+                Status: {selectedImage.status}
+              </span>
               <span className="text-sm bg-green-100 dark:bg-green-900 px-2 py-1 rounded">
                 Likes: {selectedImage.likes?.length || 0}
               </span>
@@ -273,7 +362,7 @@ const MyImage = () => {
         isOpen={!!editImage}
         onRequestClose={() => setEditImage(null)}
         contentLabel="Edit Image"
-        className="max-w-3xl mx-auto my-20 bg-white dark:bg-[#0b1424] rounded-xl p-6 outline-none shadow-lg relative overflow-y-auto max-h-[90vh]"
+        className="max-w-3xl mx-auto my-20 bg-[#12305ae8] rounded-xl p-6 outline-none shadow-lg relative overflow-y-auto max-h-[90vh]"
         overlayClassName="fixed inset-0 bg-black/50 flex items-start justify-center z-50"
       >
         {editImage && (

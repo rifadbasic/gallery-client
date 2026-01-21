@@ -19,9 +19,16 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useNavigate } from "react-router";
 
 const Account = () => {
+  
+
   const { user, deleteAccount, logOut } = useAuth();
   const axios = useAxiosSecure();
   const navigate = useNavigate();
+
+  // dynamic title
+  useEffect(() => {
+    document.title = user?.displayName + " | " + "Account" || "Account | User Dashboard";
+  }, [user]);
 
   const [accountData, setAccountData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -112,7 +119,7 @@ const Account = () => {
           return (
             <div
               key={idx}
-              className="bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow border border-gray-200 dark:border-gray-700"
+              className=" p-5 rounded-xl shadow border border-gray-200 dark:border-gray-700"
             >
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -166,7 +173,7 @@ const Account = () => {
 
         {/* RIGHT COLUMN */}
         <div className="space-y-6">
-          <div className="bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+          <div className=" p-5 rounded-xl shadow border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <Settings size={18} /> Account Status
             </h3>
@@ -181,7 +188,7 @@ const Account = () => {
             </div>
           </div>
 
-          <div className="bg-red-50 dark:bg-[#1a0f1f] p-5 rounded-xl border border-red-200 dark:border-red-800">
+          <div className=" p-5 rounded-xl border border-red-200 dark:border-red-800">
             <h3 className="font-semibold text-red-600 flex items-center gap-2">
               <Trash2 size={18} /> Danger Zone
             </h3>
@@ -230,7 +237,7 @@ const Account = () => {
 /* ========== SMALL REUSABLE UI COMPONENTS ========== */
 
 const Section = ({ title, icon, children }) => (
-  <div className="bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+  <div className=" p-5 rounded-xl shadow border border-gray-200 dark:border-gray-700">
     <h3 className="font-semibold mb-3 flex items-center gap-2">
       {icon} {title}
     </h3>

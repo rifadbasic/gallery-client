@@ -9,7 +9,11 @@ const MyGallery = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
-
+  // dynamic title
+  useEffect(() => {
+    document.title =
+      "Gallery" + " | " + user?.displayName || "My Gallery";
+  }, [user]);
   const [favoriteImages, setFavoriteImages] = useState([]);
   const [purchasedImages, setPurchasedImages] = useState([]);
 
@@ -49,7 +53,6 @@ const MyGallery = () => {
       console.error("Download failed:", err);
     }
   };
-
 
   // NEW: Handle bulk delete
   const handleBulkDelete = async () => {
@@ -105,12 +108,11 @@ const MyGallery = () => {
       />
 
       {/* LEFT SIDE ICONS (like/comment) */}
-      <div className="absolute top-2 left-2 flex flex-row items-center gap-1 ">
-        
-        <div className="bg-black/50 text-white p-1 rounded-full">
+      <div className="absolute bg-black/50 text-white p-1 px-2 rounded-2xl top-2 left-2 flex flex-row items-center gap-1 ">
+        <div className="  rounded-full">
           <FaThumbsUp size={16} />
         </div>
-        <div className="bg-black/50 text-white p-1 rounded-full">
+        <div className="  rounded-full">
           <span className="text-xs">{img.likes?.length || 0}</span>
         </div>
       </div>
@@ -127,7 +129,6 @@ const MyGallery = () => {
             >
               <FaDownload size={16} />
             </button>
-            
           </>
         )}
       </div>
@@ -204,7 +205,7 @@ const MyGallery = () => {
           {purchasedImages.length > 10 && (
             <div className="mt-4 text-center">
               <button
-                onClick={() => navigate("/purchased")} 
+                onClick={() => navigate("/purchased")}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md"
               >
                 See More Purchased Images

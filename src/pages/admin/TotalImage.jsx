@@ -4,6 +4,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function TotalImage() {
+  // dynamic tytle
+  document.title = "Total Images | Admin";
   const axiosSecure = useAxiosSecure();
 
   const [images, setImages] = useState([]);
@@ -14,7 +16,7 @@ export default function TotalImage() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
 
-  console.log(images);
+  // console.log(images);
 
   useEffect(() => {
     fetchImages();
@@ -88,10 +90,10 @@ export default function TotalImage() {
   const deselectAll = () => setSelected([]);
 
   return (
-    <div className="p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="p-4 md:p-6 min-h-screen ">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+      <h1 className="text-2xl md:text-3xl font-bold mb-4 ">
         Total Images
       </h1>
 
@@ -99,7 +101,7 @@ export default function TotalImage() {
       <input
         type="text"
         placeholder="Search by name, email, or status..."
-        className="w-full md:w-1/2 p-3 mb-4 rounded border border-gray-300 dark:border-gray-600 dark:bg-[#0d1d33] dark:text-white focus:outline-none"
+        className="w-full md:w-1/2 p-3 mb-4 rounded border border-gray-600  focus:outline-none"
         value={search}
         onChange={(e) => {
           setPage(1);
@@ -204,10 +206,10 @@ export default function TotalImage() {
             {images.map((img) => (
               <div
                 key={img._id}
-                className="bg-white dark:bg-[#0d1d33] shadow rounded-lg p-4 flex flex-col gap-2 border dark:border-gray-700"
+                className=" shadow rounded-lg p-4 flex flex-col gap-2 border dark:border-gray-700"
               >
                 <div className="flex justify-between items-center">
-                  <p className="font-semibold">{img.imageName}</p>
+                  <p className="font-semibold">{img.name}</p>
                   <input
                     type="checkbox"
                     checked={selected.includes(img._id)}
@@ -215,8 +217,8 @@ export default function TotalImage() {
                   />
                 </div>
                 <img
-                  src={img.url}
-                  alt={img.imageName}
+                  src={img.originalImage}
+                  alt={img.name}
                   className="w-full h-40 object-cover rounded"
                 />
                 <p>

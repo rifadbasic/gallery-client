@@ -26,7 +26,7 @@ const UserGalleryLayout = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="flex flex-col min-h-screen ">
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -42,7 +42,7 @@ const UserGalleryLayout = () => {
       />
 
       {/* ===== TOP NAVIGATION (DESKTOP) ===== */}
-      <nav className="hidden md:flex sticky top-0 w-full border-b border-gray-700 bg-[#0d1d33] px-6 py-4 gap-6 z-50">
+      <nav className="hidden md:flex sticky top-0 w-full border-2 rounded-lg border-gray-700 bg-[#12305ae8] px-6 py-4 gap-6 z-50">
         {links.map((item) => (
           <NavLink
             key={item.path}

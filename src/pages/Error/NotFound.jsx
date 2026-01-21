@@ -2,6 +2,9 @@ import { useNavigate } from "react-router";
 import { ArrowLeft, SearchX } from "lucide-react";
 
 const NotFound = () => {
+  // dynamic title
+  document.title = "404 | Gallery";
+
   const navigate = useNavigate();
 
   return (

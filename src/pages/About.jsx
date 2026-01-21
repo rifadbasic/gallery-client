@@ -2,6 +2,9 @@ import React from "react";
 import { Star, Quote, Users, Award, Image } from "lucide-react";
 
 const About = () => {
+  // dynamic title
+  document.title = "About | Gallery";
+
   const reviews = [
     {
       name: "Sarah Ahmed",
@@ -13,8 +16,7 @@ const About = () => {
     {
       name: "James Carter",
       role: "Photographer",
-      review:
-        "A stunning platform with amazing artists and smooth experience.",
+      review: "A stunning platform with amazing artists and smooth experience.",
       rating: 5,
     },
     {
@@ -31,12 +33,10 @@ const About = () => {
       <div className="max-w-7xl mx-auto mt-12">
         {/* TITLE */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold">
-            About Our Gallery
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold">About Our Gallery</h2>
           <p className="mt-4  max-w-2xl mx-auto">
-            Where creativity meets curation — we showcase art that tells stories,
-            sparks emotions, and inspires minds across the world.
+            Where creativity meets curation — we showcase art that tells
+            stories, sparks emotions, and inspires minds across the world.
           </p>
         </div>
 
@@ -67,48 +67,32 @@ const About = () => {
               <div className="flex items-center gap-3">
                 <Users className="text-blue-500" size={28} />
                 <div>
-                  <h4 className="font-bold text-lg ">
-                    12K+
-                  </h4>
-                  <p className="text-sm ">
-                    Happy Visitors
-                  </p>
+                  <h4 className="font-bold text-lg ">12K+</h4>
+                  <p className="text-sm ">Happy Visitors</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <Award className="text-indigo-500" size={28} />
                 <div>
-                  <h4 className="font-bold text-lg ">
-                    50+
-                  </h4>
-                  <p className="text-sm ">
-                    Awards Won
-                  </p>
+                  <h4 className="font-bold text-lg ">50+</h4>
+                  <p className="text-sm ">Awards Won</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <Image className="text-purple-500" size={28} />
                 <div>
-                  <h4 className="font-bold text-lg ">
-                    5K+
-                  </h4>
-                  <p className="text-sm ">
-                    Artworks
-                  </p>
+                  <h4 className="font-bold text-lg ">5K+</h4>
+                  <p className="text-sm ">Artworks</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <Star className="text-yellow-500" size={28} />
                 <div>
-                  <h4 className="font-bold text-lg ">
-                    4.9
-                  </h4>
-                  <p className="text-sm ">
-                    User Rating
-                  </p>
+                  <h4 className="font-bold text-lg ">4.9</h4>
+                  <p className="text-sm ">User Rating</p>
                 </div>
               </div>
             </div>

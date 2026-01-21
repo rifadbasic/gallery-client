@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
@@ -15,6 +15,11 @@ const Register = () => {
   const axios = useAxios();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // dynamic title
+  useEffect(() => {
+    document.title = "Register | Gallery";
+  }, []);
 
   // Redirect path (default to homepage)
   const from = location.state?.from || "/";
@@ -101,13 +106,13 @@ const Register = () => {
       });
 
       if (res.data.success) {
-        setUser(res.data.user); 
+        setUser(res.data.user);
 
         toast.dismiss();
         if (res.data.existing) {
           toast.info(res.data.message);
         } else {
-          toast.success(res.data.message); 
+          toast.success(res.data.message);
         }
 
         // 3️⃣ Redirect after login
@@ -115,7 +120,8 @@ const Register = () => {
       } else {
         toast.dismiss();
         toast.error(res.data.message || "Google sign-in failed.");
-      }    } catch (err) {
+      }
+    } catch (err) {
       toast.dismiss();
       toast.error("Google sign-in failed.");
       console.error(err);

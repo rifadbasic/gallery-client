@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function TotalUsers() {
+  // dynamic tytle
+  document.title = "Total Users | Admin";
+
   const axiosSecure = useAxiosSecure();
 
   const [users, setUsers] = useState([]);
@@ -66,8 +69,8 @@ export default function TotalUsers() {
   };
 
   return (
-    <div className="p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-[#0b1424]">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <div className="p-4 md:p-6 min-h-screen ">
+      <h1 className="text-2xl font-bold mb-4 ">
         User Management
       </h1>
 
@@ -75,7 +78,7 @@ export default function TotalUsers() {
       <input
         type="text"
         placeholder="Search by name or email..."
-        className="w-full p-3 border rounded-lg mb-4 dark:bg-[#0d1d33] dark:text-white"
+        className="w-full p-3 border rounded-lg mb-4 "
         value={search}
         onChange={(e) => {
           setPage(1);

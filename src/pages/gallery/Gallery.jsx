@@ -4,6 +4,11 @@ import ImageCard from "../../components/ImageCard";
 import { useGallery } from "../../context/GalleryContext";
 
 const Gallery = () => {
+
+
+  // dynamic title
+  document.title = "Gallery";
+
   const { filters } = useGallery();
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);

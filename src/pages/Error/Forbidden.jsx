@@ -2,6 +2,9 @@ import { useNavigate } from "react-router";
 import { Lock } from "lucide-react";
 
 const Forbidden = () => {
+  // dynamic title
+  document.title = "Forbidden | Gallery";
+
   const navigate = useNavigate();
 
   return (

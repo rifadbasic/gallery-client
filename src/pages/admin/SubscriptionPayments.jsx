@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function SubscriptionPayments() {
+  // dynamic tytle
+  document.title = "Subscription Payments | Admin";
+
   const axiosSecure = useAxiosSecure();
 
   const [payments, setPayments] = useState([]);
@@ -26,7 +29,6 @@ export default function SubscriptionPayments() {
 
       const total = res.data.total || 0;
 
-      
       const mappedPayments = (res.data.payments || []).map((p) => {
         let subscriptionType = "Unknown";
 
@@ -54,8 +56,8 @@ export default function SubscriptionPayments() {
   };
 
   return (
-    <div className="p-4 md:p-6 min-h-screen bg-gray-50 dark:bg-[#0b1424]">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">
+    <div className="p-4 md:p-6 min-h-screen ">
+      <h1 className="text-2xl font-bold mb-4 ">
         Subscription Payments
       </h1>
 

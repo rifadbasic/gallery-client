@@ -17,6 +17,11 @@ const UserProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
+  // dynamic tytle
+  useEffect(() => {
+    document.title = `${user?.name || user?.email || "User Profile"} | Gallery`;
+  }, [user]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -66,7 +71,10 @@ const UserProfilePage = () => {
       {/* ===== COVER PHOTO ===== */}
       <div className="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 rounded-3xl  shadow-md bg-gray-100">
         <img
-          src={user.coverPhoto || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"}
+          src={
+            user.coverPhoto ||
+            "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+          }
           alt="cover"
           className="w-full h-full object-cover rounded-3xl"
         />

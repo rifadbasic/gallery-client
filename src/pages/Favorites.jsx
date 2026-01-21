@@ -5,6 +5,11 @@ import ImageCard from "../components/ImageCard";
 import { useGallery } from "../context/GalleryContext";
 
 const Favorites = () => {
+  // dynamic title
+  useEffect(() => {
+    document.title = "My Favorites | Gallery";
+  }, []);
+
   const { user } = useAuth();
   const axios = useAxios();
   const { favorites, setInitialFavorites } = useGallery();

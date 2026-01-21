@@ -15,6 +15,11 @@ const Dashboard = () => {
   const { user: currentUser } = useAuth();
   // console.log(currentUser.email);
 
+  // dynamic title
+  useEffect(() => {
+    document.title = currentUser?.displayName + " | " + "Dashboard" || "Dashboard | User Dashboard";
+  }, [currentUser]);
+
   // ===== STATE =====
   const [uploadedImages, setUploadedImages] = useState([]);
   const [purchasedImages, setPurchasedImages] = useState([]);
@@ -129,7 +134,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+      <h1 className="text-2xl md:text-3xl font-bold ">
         Your Gallery Dashboard
       </h1>
 
@@ -138,15 +143,15 @@ const Dashboard = () => {
         {stats.map((item, index) => (
           <div
             key={index}
-            className="bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
+            className=" p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
           >
             <div className={`inline-flex p-3 rounded-lg ${item.color}`}>
               {item.icon}
             </div>
-            <h3 className="mt-3 text-gray-600 dark:text-gray-300 text-sm">
+            <h3 className="mt-3  text-sm">
               {item.title}
             </h3>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">
+            <p className="text-xl font-bold te">
               {item.value}
             </p>
           </div>
@@ -169,8 +174,8 @@ const Dashboard = () => {
       </div>
 
       {/* ===== PAYMENT HISTORY ===== */}
-      <div className="bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+      <div className=" p-5 rounded-xl shadow-sm border border-gray-700">
+        <h2 className="text-lg font-semibold mb-4  flex items-center gap-2">
           <Wallet className="w-5 h-5 text-yellow-500" />
           Payment & Sales Report
         </h2>
@@ -179,33 +184,33 @@ const Dashboard = () => {
         <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="py-2 text-gray-600 dark:text-gray-300">
+              <tr className="border-b border-gray-700">
+                <th className="py-2 ">
                   Payment ID
                 </th>
-                <th className="py-2 text-gray-600 dark:text-gray-300">
+                <th className="py-2 ">
                   Amount
                 </th>
-                <th className="py-2 text-gray-600 dark:text-gray-300">Date</th>
-                <th className="py-2 text-gray-600 dark:text-gray-300">Type</th>
+                <th className="py-2 ">Date</th>
+                <th className="py-2 ">Type</th>
               </tr>
             </thead>
             <tbody>
               {payments.map((pay) => (
                 <tr
                   key={pay._id}
-                  className="border-b border-gray-100 dark:border-gray-800"
+                  className="border-b border-gray-800"
                 >
-                  <td className="py-3 text-gray-900 dark:text-white">
+                  <td className="py-3 ">
                     {pay._id}
                   </td>
-                  <td className="py-3 text-gray-900 dark:text-white">
+                  <td className="py-3 ">
                     ৳ {pay.amount}
                   </td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">
+                  <td className="py-3 ">
                     {pay.date}
                   </td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">
+                  <td className="py-3 ">
                     {pay.pay_for}
                   </td>
                 </tr>
@@ -219,21 +224,21 @@ const Dashboard = () => {
           {payments.map((pay) => (
             <div
               key={pay._id}
-              className="bg-gray-50 dark:bg-[#132a4a] p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+              className=" p-3 rounded-lg border border-gray-200 dark:border-gray-700"
             >
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+              <p className="text-xs  truncate">
                 {pay._id}
               </p>
 
-              <p className="mt-1 text-lg font-bold text-gray-900 dark:text-white">
+              <p className="mt-1 text-lg font-bold ">
                 ৳ {pay.amount}
               </p>
 
-              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-xs  mt-1">
                 {pay.pay_for}
               </p>
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs  mt-1">
                 {pay.date}
               </p>
             </div>
@@ -257,13 +262,13 @@ const Dashboard = () => {
 
 // ===== Gallery Section Component =====
 const GallerySection = ({ title, icon, images }) => (
-  <div className="bg-white dark:bg-[#0d1d33] p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+  <div className=" p-5 rounded-xl shadow-sm border border-gray-700">
+    <h2 className="text-lg font-semibold mb-4  flex items-center gap-2">
       {icon} {title}
     </h2>
 
     {images.length === 0 ? (
-      <p className="text-center text-gray-400 dark:text-gray-500 mt-8">
+      <p className="text-center  mt-8">
         There are no images
       </p>
     ) : (
@@ -271,7 +276,7 @@ const GallerySection = ({ title, icon, images }) => (
         {images.map((img) => (
           <div
             key={img._id}
-            className="h-28 rounded-lg bg-gray-200 dark:bg-gray-800 overflow-hidden"
+            className="h-28 rounded-lg bg-gray-800 overflow-hidden"
           >
             <img
               src={img.watermarkedImage}

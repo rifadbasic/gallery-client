@@ -72,9 +72,9 @@ const UserLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="flex h-screen ">
       {/* ===== DESKTOP SIDEBAR ===== */}
-      <aside className="hidden md:flex w-64 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-[#0d1d33] p-5 flex-col gap-2 h-screen">
+      <aside className="hidden md:flex w-64 border-r border-gray-200 dark:border-gray-700  p-5 flex-col gap-2 h-screen">
         <h2 className="text-xl font-bold mb-4">User Panel</h2>
 
         {links.map((item) => (

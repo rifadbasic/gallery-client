@@ -14,6 +14,8 @@ import { AuthContext } from "../../context/AuthContext";
 import EditProfileModal from "../../components/EditProfileModal";
 
 const UserProfile = () => {
+  
+
   const userAxios = useAxios();
   const [editOpen, setEditOpen] = useState(false);
   const { user: authUser } = useContext(AuthContext);
@@ -21,6 +23,12 @@ const UserProfile = () => {
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // dynamic tytle
+  useEffect(() => {
+    document.title = user?.name || "User Profile | Gallery";
+  }, [user]);
+
   // console.log(user)
 
   useEffect(() => {
@@ -85,14 +93,18 @@ const UserProfile = () => {
       month: "long",
       year: "numeric",
     }),
-    bio: user.bio || "A passionate learner in Computer Science Technology, building dreams in code and believing in discipline, faith, and progress.",
+    bio:
+      user.bio ||
+      "A passionate learner in Computer Science Technology, building dreams in code and believing in discipline, faith, and progress.",
     avatar: user.photo,
-    cover: user.coverPhoto || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    cover:
+      user.coverPhoto ||
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
   };
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6">
-      <div className="bg-white dark:bg-[#0d1d33] rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      <div className="rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         {/* ====== COVER PHOTO WITH STATUS ====== */}
         <div className="relative h-40 md:h-56">
           <img
@@ -122,12 +134,12 @@ const UserProfile = () => {
             <img
               src={profileData.avatar}
               alt="avatar"
-              className="w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-[#0d1d33] object-cover shadow-md"
+              className="w-28 h-28 md:w-32 md:h-32 rounded-full border-2 border-[#0d1d33] object-cover shadow-md"
             />
 
             <div className="text-center md:text-left">
               <h2 className="text-2xl font-bold">{profileData.name}</h2>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-400">
                 {profileData.role}
               </p>
             </div>
@@ -149,14 +161,14 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <hr className="border-gray-200 dark:border-gray-700" />
+        <hr className="border-gray-700" />
 
         {/* ====== PROFILE DETAILS GRID ====== */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center gap-3">
             <Mail className="text-indigo-600" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+              <p className="text-sm">Email</p>
               <p className="font-medium">{profileData.email}</p>
             </div>
           </div>
@@ -164,7 +176,7 @@ const UserProfile = () => {
           <div className="flex items-center gap-3">
             <Phone className="text-indigo-600" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+              <p className="text-sm ">Phone</p>
               <p className="font-medium">{profileData.phone}</p>
             </div>
           </div>
@@ -172,7 +184,7 @@ const UserProfile = () => {
           <div className="flex items-center gap-3">
             <MapPin className="text-indigo-600" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm ">
                 Location
               </p>
               <p className="font-medium">{profileData.location}</p>
@@ -182,7 +194,7 @@ const UserProfile = () => {
           <div className="flex items-center gap-3">
             <Calendar className="text-indigo-600" />
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm ">
                 Member Since
               </p>
               <p className="font-medium">{profileData.memberSince}</p>
@@ -193,7 +205,7 @@ const UserProfile = () => {
         {/* ====== BIO SECTION ====== */}
         <div className="px-6 pb-6">
           <h3 className="text-lg font-semibold mb-2">About</h3>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className=" leading-relaxed">
             {profileData.bio}
           </p>
         </div>

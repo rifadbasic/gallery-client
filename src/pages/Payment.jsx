@@ -1,16 +1,16 @@
-import { loadStripe  } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import React from 'react';
-import CheckoutForm from '../components/CheckoutForm';
-
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import React from "react";
+import CheckoutForm from "../components/CheckoutForm";
 
 const stripePromise = loadStripe(import.meta.env.VITE_Publishable_Key);
-const Payment = ( ) => {
-
+const Payment = () => {
+  // dynamic title
+  document.title = "Payment | Gallery";
 
   return (
     <Elements stripe={stripePromise}>
-      <CheckoutForm ></CheckoutForm>
+      <CheckoutForm></CheckoutForm>
     </Elements>
   );
 };

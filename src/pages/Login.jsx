@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
@@ -6,6 +6,11 @@ import useAxios from "../hooks/useAxiosSecure";
 import { toast } from "react-toastify";
 
 const Login = () => {
+  // dynamic title
+  useEffect(() => {
+    document.title = "Login | Gallery";
+  }, []);
+
   const [showPassword, setShowPassword] = useState(false);
   const { logIn, googleSignIn, setUser } = useContext(AuthContext);
   const axios = useAxios();

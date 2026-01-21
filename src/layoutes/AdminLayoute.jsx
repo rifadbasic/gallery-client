@@ -34,9 +34,9 @@ const AdminLayout = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="flex flex-col min-h-screen ">
       {/* ===== DESKTOP TOP NAV (STICKY, INSIDE LAYOUT) ===== */}
-      <nav className="hidden md:flex sticky top-0 z-40 w-full border-b border-gray-700 bg-[#0d1d33] p-4 gap-6">
+      <nav className="hidden md:flex sticky top-0 z-40 w-full border-2 rounded-lg border-gray-700 bg-[#12305ae8]  p-4 gap-6">
         {adminNavItems.map(({ name, path, icon: Icon }) => (
           <NavLink
             key={path}

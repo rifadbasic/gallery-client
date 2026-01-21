@@ -4,6 +4,9 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function AdminPlan() {
+  // dynamic tytle
+  document.title = "Admin Plan | Admin";
+
   const axiosSecure = useAxiosSecure();
 
   const [stats, setStats] = useState({
@@ -60,10 +63,10 @@ export default function AdminPlan() {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 min-h-screen bg-gray-50 dark:bg-[#0b1424]">
+    <div className="p-4 md:p-6 space-y-6 min-h-screen ">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
+      <h1 className="text-2xl md:text-3xl font-bold ">
         Admin Overview
       </h1>
 
@@ -79,7 +82,9 @@ export default function AdminPlan() {
               className={`p-5 rounded-2xl shadow-sm border ${card.color} transition-transform hover:scale-[1.02]`}
             >
               <h3 className="text-sm font-semibold opacity-80">{card.title}</h3>
-              <p className="text-2xl md:text-3xl font-bold mt-2">{card.value}</p>
+              <p className="text-2xl md:text-3xl font-bold mt-2">
+                {card.value}
+              </p>
             </div>
           ))}
         </div>
